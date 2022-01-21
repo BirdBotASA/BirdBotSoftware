@@ -16,4 +16,7 @@ wget -P model_data https://github.com/AlexeyAB/darknet/releases/download/darknet
 ‣ yolov4-tiny
 wget -P model_data https://github.com/AlexeyAB/darknet/releases/download/darknet_yolo_v4_pre/yolov4-tiny.weights
 
+AFTER SUCCESSFUL INSTALL
+
+➡ python "BirdBotML.py"
 ```
