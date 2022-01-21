@@ -1,13 +1,3 @@
-#================================================================
-#
-#   File name   : utils.py
-#   Author      : PyLessons
-#   Created date: 2020-09-27
-#   Website     : https://pylessons.com/
-#   GitHub      : https://github.com/pythonlessons/TensorFlow-2.x-YOLOv3
-#   Description : additional yolov3 and yolov4 functions
-#
-#================================================================
 from multiprocessing import Process, Queue, Pipe
 import cv2
 import os

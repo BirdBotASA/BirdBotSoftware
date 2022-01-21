@@ -1,13 +1,3 @@
-#================================================================
-#
-#   File name   : detection_custom.py
-#   Author      : PyLessons
-#   Created date: 2020-09-17
-#   Website     : https://pylessons.com/
-#   GitHub      : https://github.com/pythonlessons/TensorFlow-2.x-YOLOv3
-#   Description : object detection image and video example
-#
-#================================================================
 import os
 import cv2
 import numpy as np

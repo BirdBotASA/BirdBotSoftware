@@ -1,13 +1,3 @@
-#================================================================
-#
-#   File name   : evaluate_mAP.py
-#   Author      : PyLessons
-#   Created date: 2020-08-17
-#   Website     : https://pylessons.com/
-#   GitHub      : https://github.com/pythonlessons/TensorFlow-2.x-YOLOv3
-#   Description : used to evaluate model mAP and FPS
-#
-#================================================================
 import os
 os.environ['CUDA_VISIBLE_DEVICES'] = '0'
 import cv2

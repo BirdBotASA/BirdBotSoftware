@@ -1,13 +1,3 @@
-#================================================================
-#
-#   File name   : Detection_to_XML.py
-#   Author      : PyLessons
-#   Created date: 2020-09-27
-#   Website     : https://pylessons.com/
-#   GitHub      : https://github.com/pythonlessons/TensorFlow-2.x-YOLOv3
-#   Description : converts YOLO detection to XML file
-#
-#===============================================================
 from textwrap import dedent
 from lxml import etree
 import glob
