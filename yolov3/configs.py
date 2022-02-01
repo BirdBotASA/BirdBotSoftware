@@ -67,11 +67,11 @@ HAT_MODE = False
 
 # BirdBot Twitch Bot Config
 TWITCH_ACTIVE 				= True
-TWITCH_CLIENT_ID 			= "uc9gvvh0ap2m53sacc7fh25avs7oyi"
-TWITCH_NICK 				= "BirdBotThinks"
-TWITCH_TOKEN 				= "oauth:jxto1bp37wsrjv9djerjfyvy9a2881"
-TWITCH_CHANNELS 			= "BirdBotML"
-TWITCH_CLIENT_SECRET 		= "u4q4gm0f2712y4hptdvnxzs3cl6wax"
+TWITCH_CLIENT_ID 			= ""
+TWITCH_NICK 				= ""
+TWITCH_TOKEN 				= ""
+TWITCH_CHANNELS 			= ""
+TWITCH_CLIENT_SECRET 		= ""
 MODT = False
 
 # TEST options
