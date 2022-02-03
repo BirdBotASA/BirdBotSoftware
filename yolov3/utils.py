@@ -2,16 +2,13 @@ from multiprocessing import Process, Queue, Pipe
 import cv2
 import os
 import time, queue, threading
-import d3dshot
 import random
 import colorsys
 import numpy as np
 import textwrap
-# import vlc
 import re
 import keyboard
 import subprocess
-import win32gui, win32ui, win32con
 import tensorflow as tf
 import yolov3.twitch_speaker as TCI
 import xml.etree.cElementTree as ET

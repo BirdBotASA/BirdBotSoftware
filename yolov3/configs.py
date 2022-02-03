@@ -66,7 +66,7 @@ WRITE_VIDEO_TRAIN_FILE      = False
 HAT_MODE = False
 
 # BirdBot Twitch Bot Config
-TWITCH_ACTIVE 				= True
+TWITCH_ACTIVE 				= False
 TWITCH_CLIENT_ID 			= ""
 TWITCH_NICK 				= ""
 TWITCH_TOKEN 				= ""
