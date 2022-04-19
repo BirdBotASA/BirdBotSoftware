@@ -1,32 +1,28 @@
 # BirdBotWindows
-This is the repository for the BirdBotASA machine learning software. A majority of this code is for machine learning set up, the rest is probably GUI files.
+This is the repository for the BirdBotASA machine learning software. BirdBot software is now launching a soft alpha which will allow people to run the software using any computer and camera hardware. Users can connect their Algorand Wallet as well as name their camera to be awarded BIRDS tokens daily.
 
+DOWNLOAD AND INSTALL MINICONDA 3.8: https://repo.anaconda.com/miniconda/Miniconda3-py38_4.11.0-Windows-x86_64.exe
 
+DOWNLOAD BIRDBOT AND PLACE ON DESKTOP: https://github.com/BirdBotASA/BirdBotWindows/archive/refs/heads/main.zip
 
 ```
-‣ install CUDA for GPU accesses, increases speed of machine learning (Optional)
-conda create -n BirdBot python=3.8
+OPEN MINICONDA THEN FOLLOW INSTRUCTIONS BELOW
 
-‣ install CUDA for GPU accesses, increases speed of machine learning (Optional)
-conda activate BirdBot
+1.) Create a new miniconda enviornment called BirdBot with python 3.8 installed.
 
-‣ install CUDA for GPU accesses, increases speed of machine learning (Optional)
-conda install cudatoolkit=10.1
+➡ conda create -n BirdBot python=3.8
 
-‣ install package requirements and TensorFlow 2.3.1
-pip install -r ./requirements.txt
+2.) Activate the miniconda enviornment that you just created.
 
-‣ yolov3
-wget -P model_data https://pjreddie.com/media/files/yolov3.weights
+➡ conda activate BirdBot
 
-‣ yolov3-tiny
-wget -P model_data https://pjreddie.com/media/files/yolov3-tiny.weights
+3.) Install CUDA for GPU accesses, increases speed of machine learning (Optional)
 
-‣ yolov4
-wget -P model_data https://github.com/AlexeyAB/darknet/releases/download/darknet_yolo_v3_optimal/yolov4.weights
+➡ conda install cudatoolkit=10.1
 
-‣ yolov4-tiny
-wget -P model_data https://github.com/AlexeyAB/darknet/releases/download/darknet_yolo_v4_pre/yolov4-tiny.weights
+4.) Install package requirements for BirdBotML.py and TensorFlow 2.3.1
+
+➡ pip install -r ./requirements.txt
 
 AFTER SUCCESSFUL INSTALL
 
