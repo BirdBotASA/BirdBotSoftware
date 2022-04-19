@@ -69,7 +69,7 @@ window.config(background = "white")
 
 # Create a File Explorer label
 label_file_explorer = Label(window,
-                            text = "BirdBot Beta ML Software - Please Use Buttons Below!",
+                            text = "BirdBot Alpha ML Software - Please Use Buttons Below!",
                             width = 100, height = 4,
                             fg = "blue")     
 
