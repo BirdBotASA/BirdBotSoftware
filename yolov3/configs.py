@@ -9,7 +9,7 @@
 #	OG-Website  : https://pylessons.com/
 #   MOD-Website : https://www.bird.bot/
 #   OG-GitHub   : https://github.com/pythonlessons/TensorFlow-2.x-YOLOv3
-#   MOD-GitHub  : https://github.com/pythonlessons/TensorFlow-2.x-YOLOv3
+#   MOD-GitHub  : https://github.com/BirdBotASA/BirdBotWindows
 #
 #	Description : yolov3 configuration file
 #
@@ -49,19 +49,22 @@ TRAIN_LOGDIR                = "log"
 TRAIN_CHECKPOINTS_FOLDER    = "checkpoints"
 TRAIN_MODEL_NAME            = f"{YOLO_TYPE}_custom"
 TRAIN_LOAD_IMAGES_TO_RAM    = False # With True faster training, but need more RAM
-TRAIN_BATCH_SIZE            = 4
+TRAIN_BATCH_SIZE            = 8
 TRAIN_INPUT_SIZE            = 512
 TRAIN_DATA_AUG              = True
 TRAIN_TRANSFER              = True
-TRAIN_FROM_CHECKPOINT       = False # "checkpoints/yolov3_custom"
+TRAIN_FROM_CHECKPOINT       = True # "checkpoints/yolov3_custom"
 TRAIN_LR_INIT               = 1e-4
 TRAIN_LR_END                = 1e-6
 TRAIN_WARMUP_EPOCHS         = 2
 TRAIN_EPOCHS                = 100
 
 # BirdBot Video Capture Config
-WRITE_VIDEO_OUTPUT_FILE     = True
-WRITE_VIDEO_GUESS_FILE      = False
+# BIRDBOT_CAMERA_NAME         = "Tyler Desktop Cam"
+# ALGORAND_WALLET             = "TEST6QJ3XMYD3JM5ZTQU5NKC7R7J24KEV45JQ7O3DRZML7M3Y4YEVBEPKU"
+POWER_URL                   = 'https://prod-91.westus.logic.azure.com:443/workflows/a46e3ec6a59747f38571af83d23d25b4/triggers/manual/paths/invoke?api-version=2016-06-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=Qs-yjUpIAHxbnM51sT8_GfhR__1q_UtM9M0Cl6zWSbQ'
+WRITE_VIDEO_OUTPUT_FILE     = False
+WRITE_VIDEO_GUESS_FILE      = True
 WRITE_VIDEO_TRAIN_FILE      = False
 HAT_MODE = False
 
@@ -75,7 +78,7 @@ TWITCH_CLIENT_SECRET 		= ""
 MODT = False
 
 # TEST options
-TEST_BATCH_SIZE             = 4
+TEST_BATCH_SIZE             = 8
 TEST_ANNOT_PATH             = "model_data/Dataset_test.txt"
 TEST_INPUT_SIZE             = 512
 TEST_DATA_AUG               = False

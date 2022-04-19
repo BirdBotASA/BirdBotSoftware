@@ -1,3 +1,14 @@
+#================================================================
+#
+#   File name   : dataset.py
+#   Author      : PyLessons
+#   Created date: 2020-07-31
+#   Website     : https://pylessons.com/
+#   GitHub      : https://github.com/pythonlessons/TensorFlow-2.x-YOLOv3
+#   Description : functions used to prepare dataset for custom training
+#
+#================================================================
+# TODO: transfer numpy to tensorflow operations
 import os
 import cv2
 import random

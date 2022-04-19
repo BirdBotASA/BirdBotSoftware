@@ -1378,14 +1378,7 @@ class Ui_MainWindow(QMainWindow):
         
             
     def VideoProcessButton(self):
-        response = QFileDialog.getOpenFileName(
-            caption='Select a Media File',
-            directory=os.getcwd()
-        )
-        video_path = ""
-        video_path = response[0]
-        if video_path:
-            ProcessVideo_GUI(self, yolo, video_path, video_path[:-4] + '-ML.mp4', input_size=YOLO_INPUT_SIZE, show=True, CLASSES=TRAIN_CLASSES, rectangle_colors=(255,0,0))
+        ProcessVideo_GUI(self, yolo, '', '', input_size=YOLO_INPUT_SIZE, show=True, CLASSES=TRAIN_CLASSES, rectangle_colors=(255,0,0))
             
     def RealTimeButton(self):
         ProcessRealTime_GUI(self, yolo, '', input_size=YOLO_INPUT_SIZE, show=True, CLASSES=TRAIN_CLASSES, rectangle_colors=(255, 0, 0))

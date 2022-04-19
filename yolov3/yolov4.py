@@ -1,3 +1,13 @@
+#================================================================
+#
+#   File name   : yolov4.py
+#   Author      : PyLessons
+#   Created date: 2020-09-31
+#   Website     : https://pylessons.com/
+#   GitHub      : https://github.com/pythonlessons/TensorFlow-2.x-YOLOv3
+#   Description : main yolov3 & yolov4 functions
+#
+#================================================================
 import numpy as np
 import tensorflow as tf
 from tensorflow.keras.layers import Conv2D, Input, LeakyReLU, ZeroPadding2D, BatchNormalization, MaxPool2D

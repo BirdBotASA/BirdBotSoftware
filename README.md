@@ -1,7 +1,19 @@
 # BirdBotWindows
 This is the repository for the BirdBotASA machine learning software. A majority of this code is for machine learning set up, the rest is probably GUI files.
 
+
+
 ```
+‣ install CUDA for GPU accesses, increases speed of machine learning (Optional)
+conda create -n BirdBot python=3.8
+
+‣ install CUDA for GPU accesses, increases speed of machine learning (Optional)
+conda activate BirdBot
+
+‣ install CUDA for GPU accesses, increases speed of machine learning (Optional)
+conda install cudatoolkit=10.1
+
+‣ install package requirements and TensorFlow 2.3.1
 pip install -r ./requirements.txt
 
 ‣ yolov3

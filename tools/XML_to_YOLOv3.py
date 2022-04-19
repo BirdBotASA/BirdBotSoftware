@@ -1,3 +1,13 @@
+#================================================================
+#
+#   File name   : XML_to_YOLOv3.py
+#   Author      : PyLessons
+#   Created date: 2020-06-04
+#   Website     : https://pylessons.com/
+#   GitHub      : https://github.com/pythonlessons/TensorFlow-2.x-YOLOv3
+#   Description : used to convert XML labels to YOLOv3 training labels
+#
+#================================================================
 import xml.etree.ElementTree as ET
 import os
 import glob

@@ -1,13 +1,24 @@
+#================================================================
+#
+#   File name   : utils.py
+#   Author      : PyLessons
+#   Created date: 2020-09-27
+#   Website     : https://pylessons.com/
+#   GitHub      : https://github.com/pythonlessons/TensorFlow-2.x-YOLOv3
+#   Description : additional yolov3 and yolov4 functions
+#
+#================================================================
 from multiprocessing import Process, Queue, Pipe
 import cv2
 import os
 import time, queue, threading
 import random
-import colorsys
 import numpy as np
 import textwrap
+import vlc
+import json
 import re
-import keyboard
+import requests
 import subprocess
 import tensorflow as tf
 import yolov3.twitch_speaker as TCI
@@ -16,9 +27,9 @@ from threading import Thread
 from xml.dom import minidom
 from datetime import datetime
 from yolov3.configs import *
+from yolov3.wallet import *
 from yolov3.yolov4 import *
 from yolov3.twitch_listener import *
-from PIL import ImageGrab
 from tensorflow.python.saved_model import tag_constants
 from numpy import mean
 from PyQt5 import QtCore, QtGui, QtWidgets
@@ -246,7 +257,7 @@ def draw_bbox(image, bboxes, CLASSES=YOLO_COCO_CLASSES, show_label=True, show_co
         elif NUM_CLASS[class_ind] == 'European Starling':
             rectangle_colors = (96,96,96)
         elif NUM_CLASS[class_ind] == 'Golden-crowned Sparrow':
-            rectangle_colors = (0,205,205)
+            rectangle_colors = (0,215,215)
         elif NUM_CLASS[class_ind] == 'House Finch - Male':
             rectangle_colors = (212,170,255)
         elif NUM_CLASS[class_ind] == 'House Finch - Female':
@@ -257,10 +268,12 @@ def draw_bbox(image, bboxes, CLASSES=YOLO_COCO_CLASSES, show_label=True, show_co
             rectangle_colors = (138,144,177)
         elif NUM_CLASS[class_ind] == 'Pine Siskin':
             rectangle_colors = (137,110,97)
+        elif NUM_CLASS[class_ind] == 'Purple Finch':
+            rectangle_colors = (117,30,220)
         elif NUM_CLASS[class_ind] == 'Red-breasted Nuthatch':
             rectangle_colors = (58,95,196)
         elif NUM_CLASS[class_ind] == 'Ruby-crowned Kinglet':
-            rectangle_colors = (160,160,0)
+            rectangle_colors = (0,128,128)
         elif NUM_CLASS[class_ind] == 'Steller\'s Jay':
             rectangle_colors = (191,95,0)
         elif NUM_CLASS[class_ind] == 'Spotted Towhee':
@@ -269,6 +282,14 @@ def draw_bbox(image, bboxes, CLASSES=YOLO_COCO_CLASSES, show_label=True, show_co
             rectangle_colors = (10,255,0)
         elif NUM_CLASS[class_ind] == 'Townsend\'s Warbler':
             rectangle_colors = (53,214,255)
+        elif NUM_CLASS[class_ind] == 'Black Vulture':
+            rectangle_colors = (22,22,22)
+        elif NUM_CLASS[class_ind] == 'Turkey Vulture':
+            rectangle_colors = (0,95,142)
+        elif NUM_CLASS[class_ind] == 'Osprey':
+            rectangle_colors = (66,98,117)
+        elif NUM_CLASS[class_ind] == 'Bald Eagle':
+            rectangle_colors = (213,209,205)
         else:
             rectangle_colors = (255,255,255)
         
@@ -282,7 +303,7 @@ def draw_bbox(image, bboxes, CLASSES=YOLO_COCO_CLASSES, show_label=True, show_co
             red.append(255)
         
         bbox_color = rectangle_colors
-        bbox_thick = int(0.6 * (image_h + image_w) / 1000)
+        bbox_thick = int(0.5 * (image_h + image_w) / 1000)
         if bbox_thick < 1: bbox_thick = 1
         fontScale = 0.75 * bbox_thick
         (x1, y1), (x2, y2) = (coor[0], coor[1]), (coor[2], coor[3])
@@ -576,7 +597,7 @@ def detect_video_realtime_mp(video_path, output_path, input_size=YOLO_INPUT_SIZE
 
     cv2.destroyAllWindows()
 
-def detect_video(Yolo, video_path, output_path, input_size=YOLO_INPUT_SIZE, show=True, CLASSES=TRAIN_CLASSES, score_threshold=0.60, iou_threshold=0.5, rectangle_colors='', HatMode=''):
+def detect_video(Yolo, video_path, output_path, input_size=YOLO_INPUT_SIZE, show=True, CLASSES=TRAIN_CLASSES, score_threshold=0.5, iou_threshold=0.3, rectangle_colors='', HatMode=''):
     
     global randomFirstTime
     global random_file_array
@@ -587,7 +608,7 @@ def detect_video(Yolo, video_path, output_path, input_size=YOLO_INPUT_SIZE, show
     hatCounter = -1
     
     print(video_path)
-    print(HatMode)
+    print("Hat Mode: " + str(HatMode))
     
     times, times_2 = [], []
     vid = cv2.VideoCapture(video_path)
@@ -609,6 +630,8 @@ def detect_video(Yolo, video_path, output_path, input_size=YOLO_INPUT_SIZE, show
     
     frameCount = 0
     videoRecordIncrementor = 0
+    birdCountMax = 0
+    birdsEarned = 0
     min_frames_thresh = 60
     frameThreshold = 90
     species_frame_count = 0
@@ -646,6 +669,8 @@ def detect_video(Yolo, video_path, output_path, input_size=YOLO_INPUT_SIZE, show
         
         t = time.localtime()
         current_time = time.strftime("%m-%d-%Y %H:%M:%S", t)
+        csv_date = time.strftime("%m-%d-%Y", t)
+        csv_time = time.strftime("%H:%M:%S", t)
         
         if img is None:
             if WRITE_VIDEO_OUTPUT_FILE:
@@ -706,6 +731,10 @@ def detect_video(Yolo, video_path, output_path, input_size=YOLO_INPUT_SIZE, show
             
             if len(temp_species_array) <= i or (approval_species_array.count(currentSpecies) >= min_frames_thresh and currentSpecies not in temp_species_array):
                 temp_species_array.append(currentSpecies)
+                
+                birdSpeciesCount = len(temp_species_array)
+                birdsTokenCalc = birdSpeciesCount * 5
+                birdsEarned += birdsTokenCalc
             
             if currentSpecies in approval_species_array:
                 
@@ -732,7 +761,9 @@ def detect_video(Yolo, video_path, output_path, input_size=YOLO_INPUT_SIZE, show
             y = 45 + i * gap
             x = 40 + textsize[0]
             
-            cv2.rectangle(blk, (20, 20), (x, y+10), (255, 255, 255), cv2.FILLED)    
+            cv2.rectangle(blk, (20, 20), (x, y+10), (255, 255, 255), cv2.FILLED)
+
+            cv2.rectangle(blk, (20, y), (215, y+38), (255, 255, 255), cv2.FILLED)            
         
         
         # Create opacity overlay        
@@ -748,6 +779,37 @@ def detect_video(Yolo, video_path, output_path, input_size=YOLO_INPUT_SIZE, show
             x = int((image.shape[1] - textsize[0]) / 2)
         
             cv2.putText(image, line, (30, y-2), cv2.FONT_HERSHEY_COMPLEX_SMALL, fontScale, (0,0,0), bbox_thick, lineType=cv2.LINE_AA)
+            
+            cv2.putText(image, "Bird Count [" + str(birdCountMax) + "]: " + str(birdCount), (30, y+28), cv2.FONT_HERSHEY_COMPLEX_SMALL, fontScale, (0,0,0), bbox_thick, lineType=cv2.LINE_AA)
+        
+        birdCount = len(bboxes)
+        
+        if birdCount > birdCountMax:
+        
+            birdCountMax = birdCount
+            
+            url = 'https://prod-91.westus.logic.azure.com:443/workflows/a46e3ec6a59747f38571af83d23d25b4/triggers/manual/paths/invoke?api-version=2016-06-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=Qs-yjUpIAHxbnM51sT8_GfhR__1q_UtM9M0Cl6zWSbQ'
+            
+            BirdBotHeaders = {'Content-type': 'application/json', 'Accept': 'text/plain'}
+            
+            # print(currentSpecies)
+            
+            BirdBotData = {
+                'Date': csv_date,
+                'Time': csv_time,
+                'BIRDS_Earned': birdsEarned,
+                'Algorand_Wallet': ALGORAND_WALLET,
+                'BirdBot_Camera': str(BIRDBOT_CAMERA_NAME),
+                'Bird_Species_Triggered': str(currentSpecies),
+                'Bird_Photo': '2121.jpg',
+                'Bird_Species_Array': str(approval_species_array),
+                'Number_of_Birds': birdCount,
+                'Duration_of_Sighting_(Seconds)': "15.10364938"
+            }
+
+            # BirdBotDataLog = requests.post(url, json=BirdBotData, headers=BirdBotHeaders) #UNCOMMENT TO SEND TO DB
+            
+            # print(BirdBotDataLog)
         
         t3 = time.time()
         times.append(t2-t1)
@@ -806,18 +868,22 @@ def detect_video(Yolo, video_path, output_path, input_size=YOLO_INPUT_SIZE, show
     cv2.destroyAllWindows()
 
 # detect from webcam
-def detect_realtime(Yolo, output_path, input_size=YOLO_INPUT_SIZE, show=False, CLASSES=YOLO_COCO_CLASSES, score_threshold=0.6, iou_threshold=0.4, rectangle_colors=''):
+def detect_realtime(Yolo, output_path, input_size=YOLO_INPUT_SIZE, show=False, CLASSES=YOLO_COCO_CLASSES, score_threshold=0.5, iou_threshold=0.3, rectangle_colors='', ALGORAND_WALLET=''):
     times, times_2 = [], []
     vid = cv2.VideoCapture(1)
 
     # by default VideoCapture returns float instead of int
-    width = int(vid.get(cv2.CAP_PROP_FRAME_WIDTH))
-    height = int(vid.get(cv2.CAP_PROP_FRAME_HEIGHT))
+    # width = int(vid.get(cv2.CAP_PROP_FRAME_WIDTH))
+    width = 1920
+    print(width)
+    # height = int(vid.get(cv2.CAP_PROP_FRAME_HEIGHT))
+    height = 1080
+    print(height)
     fps = int(vid.get(cv2.CAP_PROP_FPS))
     codec = cv2.VideoWriter_fourcc(*'mp4v')
     
     if WRITE_VIDEO_OUTPUT_FILE:
-        out = cv2.VideoWriter(output_path + '-Test.mp4', codec, fps, (width, height)) # output_path must be .mp4
+        out = cv2.VideoWriter(output_path, codec, fps, (width, height)) # output_path must be .mp4
     
     if WRITE_VIDEO_TRAIN_FILE:
         train = cv2.VideoWriter(str(output_path[:-4] + '-Train.mp4'), codec, fps, (width, height)) # output_path must be .mp4
@@ -826,20 +892,31 @@ def detect_realtime(Yolo, output_path, input_size=YOLO_INPUT_SIZE, show=False, C
         guess = cv2.VideoWriter(str(output_path[:-4] + '-Guess.mp4'), codec, fps, (width, height)) # output_path must be .mp4
     
     frameCount = 0
+    totalDailySightingFormula = "=COUNTIF($A$2:$A$500000,INDIRECT(ADDRESS(ROW(),1)))"
+    totalSightingsFormula = "=COUNTA($D$2:$D$500000)"
+    totalUnsuccessfulFormula = "=COUNTIF($D$2:$D$500000,\"[]\")"
+    rateOfSuccess = "=(INDIRECT(ADDRESS(ROW(),8))-INDIRECT(ADDRESS(ROW(),9)))/INDIRECT(ADDRESS(ROW(),8))"
     videoRecordIncrementor = 0
-    min_frames_thresh = 60
-    frameThreshold = 90
+    min_frames_thresh = 10
+    frameThreshold = 15
     species_frame_count = 0
+    birdsEarned = 0
     seen_species_array = []
     wrapped_seen_species = ''
     approval_species_array = []
     temp_species_array = []
+    last_temp_species_array = "Last seen: []"
+    last_array_x = 160
+    last_time_seen = ""
     currentScore = []
     timer_species_array = []
+    first_guess = True
     
     t = time.localtime()
     
-    bbox_thick = int(0.6 * (height + width) / 1000)
+    start_time = time.strftime("%m-%d-%Y %H:%M:%S", t)
+    
+    bbox_thick = int(0.5 * (height + width) / 1000)
     
     if bbox_thick < 1:
         bbox_thick = 1
@@ -850,22 +927,31 @@ def detect_realtime(Yolo, output_path, input_size=YOLO_INPUT_SIZE, show=False, C
     
     _, img2 = vid.read()
     
+    img2 = cv2.resize(img2, (width, height))
+    
     blk = np.zeros(img2.shape, np.uint8)
     
     cv2.rectangle(blk, (20, height-20), (125, height-50), (255, 255, 255), cv2.FILLED)
     
-    cv2.rectangle(blk, (width-225, height-20), (width-20, height-50), (255, 255, 255), cv2.FILLED)
+    cv2.rectangle(blk, (width-225, 50), (width-20, 80), (255, 255, 255), cv2.FILLED)
+    
+    cv2.rectangle(blk, (width-225, 20), (width-20, 50), (255, 255, 255), cv2.FILLED)
 
     while True:
-        _, img = vid.read()
+        _, image = vid.read()
         
-        guess_copy = img
+        image = cv2.resize(image, (width, height))
+        
+        guess_copy = image
         currentSpecies = ''
         
         t = time.localtime()
         current_time = time.strftime("%m-%d-%Y %H:%M:%S", t)
+        csv_date = time.strftime("%m-%d-%Y", t)
+        csv_time = time.strftime("%H:%M:%S", t)
+        current_time_delta = time.time()
         
-        if img is None:
+        if image is None:
             if WRITE_VIDEO_OUTPUT_FILE:
                 out.release()
             if WRITE_VIDEO_TRAIN_FILE:
@@ -877,12 +963,12 @@ def detect_realtime(Yolo, output_path, input_size=YOLO_INPUT_SIZE, show=False, C
             print("END OF VIDEO")
             break
         
-        # blk = np.zeros(img.shape, np.uint8)
+        # blk = np.zeros(image.shape, np.uint8)
         
         # cv2.rectangle(blk, (20, height-20), (160, height-50), (255, 255, 255), cv2.FILLED)
         
         try:
-            original_image = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+            original_image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
             original_image = cv2.cvtColor(original_image, cv2.COLOR_BGR2RGB)
         except:
             break
@@ -911,6 +997,8 @@ def detect_realtime(Yolo, output_path, input_size=YOLO_INPUT_SIZE, show=False, C
         
         image = draw_bbox(original_image, bboxes, CLASSES=CLASSES, rectangle_colors=rectangle_colors)
         
+        birdCount = len(bboxes)
+        
         for i, bbox in enumerate(bboxes):
             
             currentSpecies = NUM_CLASS[int(bbox[5])]
@@ -918,24 +1006,62 @@ def detect_realtime(Yolo, output_path, input_size=YOLO_INPUT_SIZE, show=False, C
 
             approval_species_array.append(currentSpecies)
             
-            if len(temp_species_array) <= i or (approval_species_array.count(currentSpecies) >= min_frames_thresh and currentSpecies not in temp_species_array):
+            if (len(temp_species_array) <= i and approval_species_array.count(currentSpecies) >= min_frames_thresh) or (currentSpecies not in temp_species_array and approval_species_array.count(currentSpecies) >= min_frames_thresh):
+                
                 temp_species_array.append(currentSpecies)
+                last_temp_species_array = "Last seen: " + str(temp_species_array)
+                last_array_textsize = cv2.getTextSize(last_temp_species_array, cv2.FONT_HERSHEY_COMPLEX_SMALL, fontScale, bbox_thick)[0]
+                last_array_x = 40 + last_array_textsize[0]
+                
+                blk = np.zeros(img2.shape, np.uint8)
+                
+                last_time_seen = current_time
+                cv2.rectangle(blk, (width-225, height-50), (width-20, height-80), (255, 255, 255), cv2.FILLED)               
+                cv2.rectangle(blk, (20, height-20), (125, height-50), (255, 255, 255), cv2.FILLED)
+                cv2.rectangle(blk, (width-225, 20), (width-20, 50), (255, 255, 255), cv2.FILLED)
+                cv2.rectangle(blk, (width-225, 50), (width-20, 80), (255, 255, 255), cv2.FILLED)
+                
+                birdCountMax = birdCount
             
+                url = 'https://prod-91.westus.logic.azure.com:443/workflows/a46e3ec6a59747f38571af83d23d25b4/triggers/manual/paths/invoke?api-version=2016-06-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=Qs-yjUpIAHxbnM51sT8_GfhR__1q_UtM9M0Cl6zWSbQ'
+            
+                BirdBotHeaders = {'Content-type': 'application/json', 'Accept': 'text/plain'}
+                
+                start_time_delta = time.time()
+                
+                durationSighting = current_time_delta - start_time_delta
+                
+                BirdBotData = {
+                'Date': csv_date,
+                'Time': csv_time,
+                'BIRDS_Earned': birdsEarned,
+                'Algorand_Wallet': '7CZWBAQWRRXQEPRU62MKZXKLSAMCPP6VCAQMOMZT7XN3EXPM52ZTTXGRLE',
+                'BirdBot_Camera': str(BIRDBOT_CAMERA_NAME),
+                'Bird_Species_Triggered': str(currentSpecies),
+                'Bird_Photo': '2121.jpg',
+                'Bird_Species_Array': str(approval_species_array),
+                'Number_of_Birds': birdCount,
+                'Duration_of_Sighting_(Seconds)': durationSighting
+                }
+
+                BirdBotDataLog = requests.post(url, json=BirdBotData, headers=BirdBotHeaders)
+                
             if currentSpecies in approval_species_array:
                 
                 if videoRecordIncrementor < frameCount:
                     start_time = time.strftime("%m-%d-%Y %H:%M:%S", t)
-                
+                    start_time_delta = time.time()
+                    
                 species_frame_count = approval_species_array.count(currentSpecies)
                 lastMaxSpecies = max(approval_species_array)
-                videoRecordIncrementor = frameCount + 60
+                videoRecordIncrementor = frameCount + 90
                 
                 if species_frame_count >= min_frames_thresh and currentSpecies not in seen_species_array:
 
                     seen_species_array.append(currentSpecies)
                     wrapped_seen_species = textwrap.wrap('Today\'s Seen Species: '+str(seen_species_array), width=width/20)
                     
-                    print (currentSpecies + ' added to today\'s seen species')
+                    print(currentSpecies + ' added to today\'s seen species')
         
         for i, line in enumerate(wrapped_seen_species):
                         
@@ -948,6 +1074,7 @@ def detect_realtime(Yolo, output_path, input_size=YOLO_INPUT_SIZE, show=False, C
             
             cv2.rectangle(blk, (20, 20), (x, y+10), (255, 255, 255), cv2.FILLED)    
         
+        cv2.rectangle(blk, ((width-(last_array_x+20)), height-20), (width-20, height-50), (255, 255, 255), cv2.FILLED)
         
         # Create opacity overlay        
         image = cv2.addWeighted(image, 1.0, blk, 0.40, 1)
@@ -979,31 +1106,83 @@ def detect_realtime(Yolo, output_path, input_size=YOLO_INPUT_SIZE, show=False, C
         # Put FPS on screen
         image = cv2.putText(image, "FPS: {:.1f}".format(fps2), (30, height-30), cv2.FONT_HERSHEY_COMPLEX_SMALL, fontScale, (0, 0, 0), bbox_thick, lineType=cv2.LINE_AA)
         
-        # Put Time on screen
-        image = cv2.putText(image, current_time, (width-215, height-30), cv2.FONT_HERSHEY_COMPLEX_SMALL, fontScale, (0, 0, 0), bbox_thick, lineType=cv2.LINE_AA)
+        # Put BIRDS Earned on screen
+        image = cv2.putText(image, "BIRDS Earned: " + str(birdsEarned), (width-215, 40), cv2.FONT_HERSHEY_COMPLEX_SMALL, fontScale, (0, 0, 0), bbox_thick, lineType=cv2.LINE_AA)
+        
+        # Put time on screen
+        image = cv2.putText(image, current_time, (width-215, 70), cv2.FONT_HERSHEY_COMPLEX_SMALL, fontScale, (0, 0, 0), bbox_thick, lineType=cv2.LINE_AA)
         # CreateXMLfile("XML_Detections", str(int(time.time())), original_image, bboxes, read_class_names(CLASSES))
+        
+        # Put last Species Array on screen
+        image = cv2.putText(image, str(last_temp_species_array), (width-last_array_x, height-30), cv2.FONT_HERSHEY_COMPLEX_SMALL, fontScale, (0, 0, 0), bbox_thick, lineType=cv2.LINE_AA)
+        
+        # Put last time seen on screen
+        image = cv2.putText(image, last_time_seen, (width-215, height-60), cv2.FONT_HERSHEY_COMPLEX_SMALL, fontScale, (0, 0, 0), bbox_thick, lineType=cv2.LINE_AA)
+ 
         
         # print("Time: {:.2f}ms, Detection FPS: {:.1f}, total FPS: {:.1f}".format(ms, fps, fps2))
         
         # The conditional to write a train file which is anytime the object detector doesn't see anything
         if not currentSpecies and WRITE_VIDEO_TRAIN_FILE:
+        
             train.write(image)
         
         # The conditionals to write guess videos which is when the object detector sees something plus 2 seconds
         if videoRecordIncrementor > frameCount and WRITE_VIDEO_GUESS_FILE:
+            
             guess.write(guess_copy)
+            
         elif videoRecordIncrementor == frameCount and WRITE_VIDEO_GUESS_FILE:
+            
             guess.release()
+            
+            birdSpeciesCount = len(temp_species_array)
+            birdsTokenCalc = birdSpeciesCount * 5
+            birdsEarned += birdsTokenCalc
+            
+            if birdsEarned >= 1000:
+                birdsEarned = 1000
+            
             timeWithoutDate = str(current_time[-11:])
             timeWithoutDate = timeWithoutDate.replace(':','-')
+            
             os.rename(output_path[:-4] + '-Guess.mp4', 'YOLO_Videos/' + lastMaxSpecies + '-Guess' + '-' + str(current_time[:-9]) + '-' + timeWithoutDate + '.mp4')
+            
             guess = cv2.VideoWriter(str(output_path[:-4] + '-Guess.mp4'), codec, fps, (width, height))
+            
+            connection = TCI.TwitchChatIRC()
             TWITCH_SEEN_MESSAGE = 'BirdBot is ' + str("{:.2f}".format(mean(currentScore) * 100)) + '% confident it saw ' + str(temp_species_array) + ' from ' + str(start_time) + ' to ' + str(current_time)
             connection.send('BirdBotML', TWITCH_SEEN_MESSAGE)
+            connection.close_connection()
             
+            if first_guess == True:
+            
+                with open('E:\TensorFlow2\BirdGuesses.csv', newline='') as f:
+                    reader = csv.reader(f)
+                    rowID = 0
+                    for row in reader:
+                        try:
+                            row1 = row[0]
+                        except:
+                            row1 = False
+
+            with open('E:\TensorFlow2\BirdGuesses.csv', 'a', newline='') as file:
+                
+                writer = csv.writer(file)
+                
+                if row1 == False and rowID == 0:
+                    writer.writerow(["SightingDate", "Time-24H", "BirdBot Camera", "Bird Species", "Number of Birds", "Duration of Sighting (Seconds)", "Total Sightings Today, Total Sightings, Total Unsuccessful Sightings, Percentage Success"])
+                    rowID += 1
+                
+                writer.writerow([csv_date, csv_time, BIRDBOT_CAMERA_NAME, temp_species_array, len(temp_species_array), current_time_delta - start_time_delta, totalDailySightingFormula, totalSightingsFormula, totalUnsuccessfulFormula, rateOfSuccess])
+                
+                # Copies csv to OneDrive, replace with universal database
+                shutil.copy(r'E:\TensorFlow2\BirdGuesses.csv', r'C:\Users\Tyler\OneDrive\BirdGuesses.csv')
+                
             # Reset temp variables
             currentScore = []
             temp_species_array =[]
+            first_guess = False
             
         if WRITE_VIDEO_OUTPUT_FILE:
             out.write(image)
@@ -1016,6 +1195,10 @@ def detect_realtime(Yolo, output_path, input_size=YOLO_INPUT_SIZE, show=False, C
         if frameCount % frameThreshold == 0:
             approval_species_array = []
             species_frame_count = 0
+
+        if csv_time == "05:30:00":
+            birdsEarned = 0
+            seen_species_array = []
 
     cv2.destroyAllWindows()
     
@@ -1145,7 +1328,7 @@ class RTSPVideoWriterObject(object):
         self.output_video.write(self.frame)
 
 # Generate data from a machine learning model
-def generate_ml_data(Yolo, video_path, input_size=YOLO_INPUT_SIZE, show=True, CLASSES=TRAIN_CLASSES, score_threshold=0.6, iou_threshold=0.35, rectangle_colors=''):
+def generate_ml_data(Yolo, video_path, input_size=YOLO_INPUT_SIZE, show=True, CLASSES=TRAIN_CLASSES, score_threshold=0.6, iou_threshold=0.5, rectangle_colors=''):
 
     print(video_path)
     
@@ -1349,231 +1532,275 @@ def generate_ml_data(Yolo, video_path, input_size=YOLO_INPUT_SIZE, show=True, CL
     ##################################################
 
         
-def ProcessVideo_GUI(self, Yolo, video_path, output_path, input_size=YOLO_INPUT_SIZE, show=True, CLASSES=TRAIN_CLASSES, score_threshold=0.65, iou_threshold=0.3, rectangle_colors=''):
+def ProcessVideo_GUI(self, Yolo, video_path, output_path, input_size=YOLO_INPUT_SIZE, show=True, CLASSES=TRAIN_CLASSES, score_threshold=0.5, iou_threshold=0.3, rectangle_colors=''):
     
-    # self.image = cv2.imread('B:/BirdBot/BirdKeras/TensorFlow2/Dataset/train/Northern_Flicker/NorthernFlicker-10-23-30-5160.jpg')
-    # self.image = QtGui.QImage(self.image.data, self.image.shape[1], self.image.shape[0], QtGui.QImage.Format_RGB888).rgbSwapped()
-    # self.image_frame.setPixmap(QtGui.QPixmap.fromImage(self.image))
-       
     print(video_path)
     
-    times, times_2 = [], []
-    vid = cv2.VideoCapture(video_path)
-    
-    # by default VideoCapture returns float instead of int
-    width = int(vid.get(cv2.CAP_PROP_FRAME_WIDTH))
-    height = int(vid.get(cv2.CAP_PROP_FRAME_HEIGHT))
-    fps = int(vid.get(cv2.CAP_PROP_FPS))
-    codec = cv2.VideoWriter_fourcc(*'mp4v')
-    
-    if WRITE_VIDEO_OUTPUT_FILE:
-        out = cv2.VideoWriter(output_path, codec, fps, (width, height)) # output_path must be .mp4
-    
-    if WRITE_VIDEO_TRAIN_FILE:
-        train = cv2.VideoWriter(str(output_path[:-4] + '-Train.mp4'), codec, fps, (width, height)) # output_path must be .mp4
-        
-    if WRITE_VIDEO_GUESS_FILE:
-        guess = cv2.VideoWriter(str(output_path[:-4] + '-Guess.mp4'), codec, fps, (width, height)) # output_path must be .mp4
-    
-    frameCount = 0
-    videoRecordIncrementor = 0
-    min_frames_thresh = 60
-    frameThreshold = 90
-    species_frame_count = 0
-    seen_species_array = []
-    wrapped_seen_species = ''
-    approval_species_array = []
-    temp_species_array = []
-    currentScore = []
-    timer_species_array = []
-    
-    t = time.localtime()
-    
-    bbox_thick = int(0.6 * (height + width) / 1000)
-    
-    if bbox_thick < 1:
-        bbox_thick = 1
-    
-    fontScale = 0.75 * bbox_thick
-    
-    NUM_CLASS = read_class_names(CLASSES)
-    
-    _, img2 = vid.read()
-    
-    blk = np.zeros(img2.shape, np.uint8)
-    
-    cv2.rectangle(blk, (20, height-20), (125, height-50), (255, 255, 255), cv2.FILLED)
-    
-    cv2.rectangle(blk, (width-225, height-20), (width-20, height-50), (255, 255, 255), cv2.FILLED)
+    source = "B:/BirdBot/BirdModelTraining/train_images"
 
-    while True:
-        _, img = vid.read()
+    videoFiles = [f for f in os.listdir(source)
+              if re.search(r'([a-zA-Z0-9\s_\\.\-\(\):])+(.mp4)$', f)]
+
+    print(videoFiles)
+    
+    global randomFirstTime
+    global random_file_array
+    global hatCounter
+    
+    random_file_array = []
+    randomFirstTime = True
+    hatCounter = -1
+    HatMode = False
+	
+    print(video_path)
+    print("Hat Mode: " + str(HatMode))
+    
+    for file in videoFiles:
+    
+        times, times_2 = [], []
+        videoName = file
+        print(videoName)
+        vid = cv2.VideoCapture('B:/BirdBot/BirdModelTraining/train_images/'+videoName)
         
-        guess_copy = img
-        currentSpecies = ''
+        # by default VideoCapture returns float instead of int
+        width = int(vid.get(cv2.CAP_PROP_FRAME_WIDTH))
+        height = int(vid.get(cv2.CAP_PROP_FRAME_HEIGHT))
+        fps = int(vid.get(cv2.CAP_PROP_FPS))
+        codec = cv2.VideoWriter_fourcc(*'mp4v')
+        
+        if WRITE_VIDEO_OUTPUT_FILE:
+            out = cv2.VideoWriter('B:/BirdBot/BirdModelTraining/train_images/'+videoName[:-4]+'-ML.mp4', codec, fps, (width, height)) # output_path must be .mp4
+        
+        if WRITE_VIDEO_TRAIN_FILE:
+            train = cv2.VideoWriter(str(output_path[:-4] + '-Train.mp4'), codec, fps, (width, height)) # output_path must be .mp4
+            
+        if WRITE_VIDEO_GUESS_FILE:
+            guess = cv2.VideoWriter(str(output_path[:-4] + '-Guess.mp4'), codec, fps, (width, height)) # output_path must be .mp4
+        
+        frameCount = 0
+        videoRecordIncrementor = 0
+        birdCountMax = 0
+        birdsEarned = 0
+        min_frames_thresh = 60
+        frameThreshold = 90
+        species_frame_count = 0
+        seen_species_array = []
+        wrapped_seen_species = ''
+        approval_species_array = []
+        temp_species_array = []
+        currentScore = []
+        timer_species_array = []
         
         t = time.localtime()
-        current_time = time.strftime("%m-%d-%Y %H:%M:%S", t)
         
-        if img is None:
-            if WRITE_VIDEO_OUTPUT_FILE:
-                out.release()
-            if WRITE_VIDEO_TRAIN_FILE:
-                train.release()
-            if WRITE_VIDEO_GUESS_FILE:
-                guess.release()
-                os.rename(output_path[:-4] + '-Guess.mp4', 'YOLO_Videos/' + max(seen_species_array) + '-Guess' + str(videoRecordIncrementor) + '.mp4')
-            cv2.destroyAllWindows()
-            print("END OF VIDEO")
-            break
+        bbox_thick = int(0.6 * (height + width) / 1000)
         
-        # blk = np.zeros(img.shape, np.uint8)
+        if bbox_thick < 1:
+            bbox_thick = 1
         
-        # cv2.rectangle(blk, (20, height-20), (160, height-50), (255, 255, 255), cv2.FILLED)
+        fontScale = 0.75 * bbox_thick
         
-        try:
-            original_image = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-            original_image = cv2.cvtColor(original_image, cv2.COLOR_BGR2RGB)
-        except:
-            break
+        NUM_CLASS = read_class_names(CLASSES)
         
-        image_data = image_preprocess(np.copy(original_image), [input_size, input_size])
-        image_data = image_data[np.newaxis, ...].astype(np.float32)
+        _, img2 = vid.read()
+        
+        blk = np.zeros(img2.shape, np.uint8)
+        
+        cv2.rectangle(blk, (20, height-20), (125, height-50), (255, 255, 255), cv2.FILLED)
+        
+        cv2.rectangle(blk, (width-225, height-20), (width-20, height-50), (255, 255, 255), cv2.FILLED)
 
-        t1 = time.time()
-        if YOLO_FRAMEWORK == "tf":
-            pred_bbox = Yolo.predict(image_data)
-        elif YOLO_FRAMEWORK == "trt":
-            batched_input = tf.constant(image_data)
-            result = Yolo(batched_input)
-            pred_bbox = []
-            for key, value in result.items():
-                value = value.numpy()
-                pred_bbox.append(value)
-        
-        t2 = time.time()
-        
-        pred_bbox = [tf.reshape(x, (-1, tf.shape(x)[-1])) for x in pred_bbox]
-        pred_bbox = tf.concat(pred_bbox, axis=0)
-
-        bboxes = postprocess_boxes(pred_bbox, original_image, input_size, score_threshold)
-        bboxes = nms(bboxes, iou_threshold, method='nms')        
-        
-        image = draw_bbox(original_image, bboxes, CLASSES=CLASSES, rectangle_colors=rectangle_colors)
-        
-        for i, bbox in enumerate(bboxes):
+        while True:
+            _, img = vid.read()
             
-            currentSpecies = NUM_CLASS[int(bbox[5])]
-            currentScore.append(float(bbox[4]))
-
-            approval_species_array.append(currentSpecies)
+            guess_copy = img
+            currentSpecies = ''
             
-            if len(temp_species_array) <= i or (approval_species_array.count(currentSpecies) >= min_frames_thresh and currentSpecies not in temp_species_array):
-                temp_species_array.append(currentSpecies)
+            t = time.localtime()
+            current_time = time.strftime("%m-%d-%Y %H:%M:%S", t)
+            csv_date = time.strftime("%m-%d-%Y", t)
+            csv_time = time.strftime("%H:%M:%S", t)
             
-            if currentSpecies in approval_species_array:
-                
-                if videoRecordIncrementor < frameCount:
-                    start_time = time.strftime("%m-%d-%Y %H:%M:%S", t)
-                
-                species_frame_count = approval_species_array.count(currentSpecies)
-                lastMaxSpecies = max(approval_species_array)
-                videoRecordIncrementor = frameCount + 60
-                
-                if species_frame_count >= min_frames_thresh and currentSpecies not in seen_species_array:
-
-                    seen_species_array.append(currentSpecies)
-                    wrapped_seen_species = textwrap.wrap('Today\'s Seen Species: '+str(seen_species_array), width=width/20)
-                    
-                    print (currentSpecies + ' added to today\'s seen species')
-        
-        for i, line in enumerate(wrapped_seen_species):
-                        
-            textsize = cv2.getTextSize(line, cv2.FONT_HERSHEY_COMPLEX_SMALL, fontScale, bbox_thick)[0]
-
-            gap = textsize[1] + 16
-
-            y = 45 + i * gap
-            x = 40 + textsize[0]
-            
-            cv2.rectangle(blk, (20, 20), (x, y+10), (255, 255, 255), cv2.FILLED)    
-        
-        
-        # Create opacity overlay        
-        image = cv2.addWeighted(image, 1.0, blk, 0.40, 1)
-        
-        for i, line in enumerate(wrapped_seen_species):
-                        
-            textsize = cv2.getTextSize(line, cv2.FONT_HERSHEY_COMPLEX_SMALL, fontScale, bbox_thick)[0]
-
-            gap = textsize[1] + 16
-
-            y = 45 + i * gap
-            x = int((image.shape[1] - textsize[0]) / 2)
-        
-            cv2.putText(image, line, (30, y-2), cv2.FONT_HERSHEY_COMPLEX_SMALL, fontScale, (0,0,0), bbox_thick, lineType=cv2.LINE_AA)
-        
-        t3 = time.time()
-        times.append(t2-t1)
-        times_2.append(t3-t1)
-        
-        times = times[-60:]
-        times_2 = times_2[-60:]
-
-        ms = sum(times)/len(times)*1000
-        fps = 1000 / ms
-        fps2 = 1000 / (sum(times_2)/len(times_2)*1000)
-        
-        frameCount += 1
-        
-        # Put FPS on screen
-        image = cv2.putText(image, "FPS: {:.1f}".format(fps2), (30, height-30), cv2.FONT_HERSHEY_COMPLEX_SMALL, fontScale, (0, 0, 0), bbox_thick, lineType=cv2.LINE_AA)
-        
-        # Put Time on screen
-        image = cv2.putText(image, current_time, (width-215, height-30), cv2.FONT_HERSHEY_COMPLEX_SMALL, fontScale, (0, 0, 0), bbox_thick, lineType=cv2.LINE_AA)
-        # CreateXMLfile("XML_Detections", str(int(time.time())), original_image, bboxes, read_class_names(CLASSES))
-        
-        # print("Time: {:.2f}ms, Detection FPS: {:.1f}, total FPS: {:.1f}".format(ms, fps, fps2))
-        
-        # The conditional to write a train file which is anytime the object detector doesn't see anything
-        if not currentSpecies and WRITE_VIDEO_TRAIN_FILE:
-            train.write(image)
-        
-        # The conditionals to write guess videos which is when the object detector sees something plus 2 seconds
-        if videoRecordIncrementor > frameCount and WRITE_VIDEO_GUESS_FILE:
-            guess.write(guess_copy)
-        elif videoRecordIncrementor == frameCount and WRITE_VIDEO_GUESS_FILE:
-            guess.release()
-            timeWithoutDate = str(current_time[-11:])
-            timeWithoutDate = timeWithoutDate.replace(':','-')
-            os.rename(output_path[:-4] + '-Guess.mp4', 'YOLO_Videos/' + lastMaxSpecies + '-Guess' + '-' + str(current_time[:-9]) + '-' + timeWithoutDate + '.mp4')
-            guess = cv2.VideoWriter(str(output_path[:-4] + '-Guess.mp4'), codec, fps, (width, height))
-            # TWITCH_SEEN_MESSAGE = 'BirdBot is ' + str("{:.2f}".format(mean(currentScore) * 100)) + '% confident it saw ' + str(temp_species_array) + ' from ' + str(start_time) + ' to ' + str(current_time)
-            # connection.send('BirdBotML', TWITCH_SEEN_MESSAGE)
-            
-            # Reset temp variables
-            currentScore = []
-            temp_species_array =[]
-            
-        if WRITE_VIDEO_OUTPUT_FILE:
-            out.write(image)
-        if show:
-            # cv2.imshow('output', image)
-            self.image = image
-            self.image = QtGui.QImage(self.image.data, self.image.shape[1], self.image.shape[0], QtGui.QImage.Format_RGB888).rgbSwapped()
-            self.image_frame.setPixmap(QtGui.QPixmap.fromImage(self.image))
-            self.image_frame_hideConfig.setPixmap(QtGui.QPixmap.fromImage(self.image))
-            if cv2.waitKey(1) & 0xFF == ord("q"):
+            if img is None:
+                if WRITE_VIDEO_OUTPUT_FILE:
+                    out.release()
+                if WRITE_VIDEO_TRAIN_FILE:
+                    train.release()
+                if WRITE_VIDEO_GUESS_FILE:
+                    guess.release()
+                    os.rename(output_path[:-4] + '-Guess.mp4', 'YOLO_Videos/' + max(seen_species_array) + '-Guess' + str(videoRecordIncrementor) + '.mp4')
                 cv2.destroyAllWindows()
+                print("END OF VIDEO")
                 break
+            
+            # blk = np.zeros(img.shape, np.uint8)
+            
+            # cv2.rectangle(blk, (20, height-20), (160, height-50), (255, 255, 255), cv2.FILLED)
+            
+            try:
+                original_image = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+                original_image = cv2.cvtColor(original_image, cv2.COLOR_BGR2RGB)
+            except:
+                break
+            
+            image_data = image_preprocess(np.copy(original_image), [input_size, input_size])
+            image_data = image_data[np.newaxis, ...].astype(np.float32)
+
+            t1 = time.time()
+            if YOLO_FRAMEWORK == "tf":
+                pred_bbox = Yolo.predict(image_data)
+            elif YOLO_FRAMEWORK == "trt":
+                batched_input = tf.constant(image_data)
+                result = Yolo(batched_input)
+                pred_bbox = []
+                for key, value in result.items():
+                    value = value.numpy()
+                    pred_bbox.append(value)
+            
+            t2 = time.time()
+            
+            pred_bbox = [tf.reshape(x, (-1, tf.shape(x)[-1])) for x in pred_bbox]
+            pred_bbox = tf.concat(pred_bbox, axis=0)
+
+            bboxes = postprocess_boxes(pred_bbox, original_image, input_size, score_threshold)
+            bboxes = nms(bboxes, iou_threshold, method='nms')        
+            
+            if HatMode == True:
+                image, hatCounter = draw_hats(original_image, bboxes, random_file_array, hatCounter, CLASSES=CLASSES, rectangle_colors=rectangle_colors, randomFirstTime=randomFirstTime)
+            else:
+                image = draw_bbox(original_image, bboxes, CLASSES=CLASSES, rectangle_colors=rectangle_colors)
+            
+            for i, bbox in enumerate(bboxes):
                 
-        if frameCount % frameThreshold == 0:
-            approval_species_array = []
-            species_frame_count = 0
-    
-    cv2.destroyAllWindows()
-    self.image_frame_hideConfig.clear()
-    self.image_frame.clear()
+                currentSpecies = NUM_CLASS[int(bbox[5])]
+                currentScore.append(float(bbox[4]))
+                randomFirstTime = False
+
+                approval_species_array.append(currentSpecies)
+                
+                if len(temp_species_array) <= i or (approval_species_array.count(currentSpecies) >= min_frames_thresh and currentSpecies not in temp_species_array):
+                    temp_species_array.append(currentSpecies)
+                    
+                    birdSpeciesCount = len(temp_species_array)
+                    birdsTokenCalc = birdSpeciesCount * 5
+                    birdsEarned += birdsTokenCalc
+                
+                if currentSpecies in approval_species_array:
+                    
+                    if videoRecordIncrementor < frameCount:
+                        start_time = time.strftime("%m-%d-%Y %H:%M:%S", t)
+                    
+                    species_frame_count = approval_species_array.count(currentSpecies)
+                    lastMaxSpecies = max(approval_species_array)
+                    videoRecordIncrementor = frameCount + 60
+                    
+                    if species_frame_count >= min_frames_thresh and currentSpecies not in seen_species_array:
+
+                        seen_species_array.append(currentSpecies)
+                        wrapped_seen_species = textwrap.wrap('Today\'s Seen Species: '+str(seen_species_array), width=width/20)
+                        
+                        print (currentSpecies + ' added to today\'s seen species')
+            
+            for i, line in enumerate(wrapped_seen_species):
+                            
+                textsize = cv2.getTextSize(line, cv2.FONT_HERSHEY_COMPLEX_SMALL, fontScale, bbox_thick)[0]
+
+                gap = textsize[1] + 16
+
+                y = 45 + i * gap
+                x = 40 + textsize[0]
+                
+                cv2.rectangle(blk, (20, 20), (x, y+10), (255, 255, 255), cv2.FILLED)
+
+                cv2.rectangle(blk, (20, y), (215, y+38), (255, 255, 255), cv2.FILLED)            
+            
+            
+            # Create opacity overlay        
+            image = cv2.addWeighted(image, 1.0, blk, 0.40, 1)
+            
+            for i, line in enumerate(wrapped_seen_species):
+                            
+                textsize = cv2.getTextSize(line, cv2.FONT_HERSHEY_COMPLEX_SMALL, fontScale, bbox_thick)[0]
+
+                gap = textsize[1] + 16
+
+                y = 45 + i * gap
+                x = int((image.shape[1] - textsize[0]) / 2)
+            
+                cv2.putText(image, line, (30, y-2), cv2.FONT_HERSHEY_COMPLEX_SMALL, fontScale, (0,0,0), bbox_thick, lineType=cv2.LINE_AA)
+                
+                cv2.putText(image, "Bird Count [" + str(birdCountMax) + "]: " + str(birdCount), (30, y+28), cv2.FONT_HERSHEY_COMPLEX_SMALL, fontScale, (0,0,0), bbox_thick, lineType=cv2.LINE_AA)
+            
+            birdCount = len(bboxes)
+            
+            if birdCount > birdCountMax:
+            
+                birdCountMax = birdCount
+            
+            t3 = time.time()
+            times.append(t2-t1)
+            times_2.append(t3-t1)
+            
+            times = times[-60:]
+            times_2 = times_2[-60:]
+
+            ms = sum(times)/len(times)*1000
+            fps = 1000 / ms
+            fps2 = 1000 / (sum(times_2)/len(times_2)*1000)
+            
+            frameCount += 1
+            
+            # Put FPS on screen
+            image = cv2.putText(image, "FPS: {:.1f}".format(fps2), (30, height-30), cv2.FONT_HERSHEY_COMPLEX_SMALL, fontScale, (0, 0, 0), bbox_thick, lineType=cv2.LINE_AA)
+            
+            # Put Time on screen
+            image = cv2.putText(image, current_time, (width-215, height-30), cv2.FONT_HERSHEY_COMPLEX_SMALL, fontScale, (0, 0, 0), bbox_thick, lineType=cv2.LINE_AA)
+            # CreateXMLfile("XML_Detections", str(int(time.time())), original_image, bboxes, read_class_names(CLASSES))
+            
+            # print("Time: {:.2f}ms, Detection FPS: {:.1f}, total FPS: {:.1f}".format(ms, fps, fps2))
+            
+            # The conditional to write a train file which is anytime the object detector doesn't see anything
+            if not currentSpecies and WRITE_VIDEO_TRAIN_FILE:
+                train.write(image)
+            
+            # The conditionals to write guess videos which is when the object detector sees something plus 2 seconds
+            if videoRecordIncrementor > frameCount and WRITE_VIDEO_GUESS_FILE:
+                guess.write(guess_copy)
+            elif videoRecordIncrementor == frameCount and WRITE_VIDEO_GUESS_FILE:
+                guess.release()
+                timeWithoutDate = str(current_time[-11:])
+                timeWithoutDate = timeWithoutDate.replace(':','-')
+                os.rename(output_path[:-4] + '-Guess.mp4', 'YOLO_Videos/' + lastMaxSpecies + '-Guess' + '-' + str(current_time[:-9]) + '-' + timeWithoutDate + '.mp4')
+                guess = cv2.VideoWriter(str(output_path[:-4] + '-Guess.mp4'), codec, fps, (width, height))
+                # TWITCH_SEEN_MESSAGE = 'BirdBot is ' + str("{:.2f}".format(mean(currentScore) * 100)) + '% confident it saw ' + str(temp_species_array) + ' from ' + str(start_time) + ' to ' + str(current_time)
+                # connection.send('BirdBotML', TWITCH_SEEN_MESSAGE)
+                
+                # Reset temp variables
+                currentScore = []
+                temp_species_array =[]
+                
+            if WRITE_VIDEO_OUTPUT_FILE:
+                out.write(image)
+            if show:
+                # cv2.imshow('output', image)
+                self.image = image
+                self.image = QtGui.QImage(self.image.data, self.image.shape[1], self.image.shape[0], QtGui.QImage.Format_RGB888).rgbSwapped()
+                self.image_frame.setPixmap(QtGui.QPixmap.fromImage(self.image))
+                self.image_frame_hideConfig.setPixmap(QtGui.QPixmap.fromImage(self.image))
+                if cv2.waitKey(1) & 0xFF == ord("q"):
+                    cv2.destroyAllWindows()
+                    break
+                if cv2.waitKey(1) & 0xFF == ord("q"):
+                    cv2.destroyAllWindows()
+                    break
+                    
+            if frameCount % frameThreshold == 0:
+                approval_species_array = []
+                species_frame_count = 0
+
+        cv2.destroyAllWindows()
+        self.image_frame_hideConfig.clear()
+        self.image_frame.clear()
 
 def ProcessRealTime_GUI(self, Yolo, output_path, input_size=YOLO_INPUT_SIZE, show=False, CLASSES=YOLO_COCO_CLASSES, score_threshold=0.6, iou_threshold=0.4, rectangle_colors=''):
     times, times_2 = [], []
@@ -1782,7 +2009,7 @@ def ProcessRealTime_GUI(self, Yolo, output_path, input_size=YOLO_INPUT_SIZE, sho
             self.image = QtGui.QImage(self.image.data, self.image.shape[1], self.image.shape[0], QtGui.QImage.Format_RGB888).rgbSwapped()
             self.image_frame.setPixmap(QtGui.QPixmap.fromImage(self.image))
             self.image_frame_hideConfig.setPixmap(QtGui.QPixmap.fromImage(self.image))
-            if cv2.waitKey(1) & keyboard.is_pressed('q'):
+            if cv2.waitKey(1) & key == ord('q'):
                 cv2.destroyAllWindows()
                 self.image_frame_hideConfig.clear()
                 self.image_frame.clear()
@@ -1797,7 +2024,7 @@ def ProcessRealTime_GUI(self, Yolo, output_path, input_size=YOLO_INPUT_SIZE, sho
     self.image_frame.clear()
     
 # Generate data from a machine learning model
-def generate_ml_data_GUI(self, Yolo, video_path, input_size=YOLO_INPUT_SIZE, show=True, CLASSES=TRAIN_CLASSES, score_threshold=0.4, iou_threshold=0.6, rectangle_colors=''):
+def generate_ml_data_GUI(self, Yolo, video_path, input_size=YOLO_INPUT_SIZE, show=True, CLASSES=TRAIN_CLASSES, score_threshold=0.4, iou_threshold=0.3, rectangle_colors=''):
 
     print(video_path)
     
@@ -1812,7 +2039,7 @@ def generate_ml_data_GUI(self, Yolo, video_path, input_size=YOLO_INPUT_SIZE, sho
     current_time = now.strftime("%m-%d-%M")
 
     currentframe = 0
-    countframes = 25
+    countframes = 30
     total_count = 0
     currentSpecies = ''
     currentSpeciesArray = []

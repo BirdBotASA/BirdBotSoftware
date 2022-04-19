@@ -1,3 +1,13 @@
+#================================================================
+#
+#   File name   : Convert_to_TRT.py
+#   Author      : PyLessons
+#   Created date: 2020-08-17
+#   Website     : https://pylessons.com/
+#   GitHub      : https://github.com/pythonlessons/TensorFlow-2.x-YOLOv3
+#   Description : convert TF frozen graph to TensorRT model
+#
+#================================================================
 import os
 os.environ['CUDA_VISIBLE_DEVICES'] = '1'
 import sys
