@@ -35,4 +35,4 @@ AFTER SUCCESSFUL INSTALL
 ➡ 
 ```
 
-[image](https://user-images.githubusercontent.com/98153765/164117037-ed1b0ed4-93b2-4ae9-9a9c-9dc5feec9570.png)
+![image](https://user-images.githubusercontent.com/98153765/164117037-ed1b0ed4-93b2-4ae9-9a9c-9dc5feec9570.png)
