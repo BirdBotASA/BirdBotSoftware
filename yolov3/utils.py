@@ -1140,8 +1140,8 @@ def detect_realtime(Yolo, output_path, input_size=YOLO_INPUT_SIZE, show=False, C
             birdsTokenCalc = birdSpeciesCount * 5
             birdsEarned += birdsTokenCalc
             
-            if birdsEarned >= 1000:
-                birdsEarned = 1000
+            if birdsEarned >= 500:
+                birdsEarned = 500
             
             timeWithoutDate = str(current_time[-11:])
             timeWithoutDate = timeWithoutDate.replace(':','-')
