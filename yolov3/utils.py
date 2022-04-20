@@ -870,7 +870,7 @@ def detect_video(Yolo, video_path, output_path, input_size=YOLO_INPUT_SIZE, show
 # detect from webcam
 def detect_realtime(Yolo, output_path, input_size=YOLO_INPUT_SIZE, show=False, CLASSES=YOLO_COCO_CLASSES, score_threshold=0.5, iou_threshold=0.3, rectangle_colors='', ALGORAND_WALLET=''):
     times, times_2 = [], []
-    vid = cv2.VideoCapture(1)
+    vid = cv2.VideoCapture(0)
 
     # by default VideoCapture returns float instead of int
     # width = int(vid.get(cv2.CAP_PROP_FRAME_WIDTH))
@@ -2039,7 +2039,7 @@ def generate_ml_data_GUI(self, Yolo, video_path, input_size=YOLO_INPUT_SIZE, sho
     current_time = now.strftime("%m-%d-%M")
 
     currentframe = 0
-    countframes = 30
+    countframes = 60
     total_count = 0
     currentSpecies = ''
     currentSpeciesArray = []
