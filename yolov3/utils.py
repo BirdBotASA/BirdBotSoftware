@@ -786,8 +786,6 @@ def detect_video(Yolo, video_path, output_path, input_size=YOLO_INPUT_SIZE, show
             
             cv2.putText(image, "Bird Count [" + str(birdCountMax) + "]: " + str(birdCount), (30, y+28), cv2.FONT_HERSHEY_COMPLEX_SMALL, fontScale, (0,0,0), bbox_thick, lineType=cv2.LINE_AA)
         
-        birdCount = len(bboxes)
-        
         t3 = time.time()
         times.append(t2-t1)
         times_2.append(t3-t1)
