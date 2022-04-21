@@ -25,6 +25,7 @@ import subprocess
 import tensorflow as tf
 import yolov3.twitch_speaker as TCI
 import xml.etree.cElementTree as ET
+from geopy.geocoders import Nominatim
 from threading import Thread
 from xml.dom import minidom
 from datetime import datetime
@@ -839,9 +840,10 @@ def detect_video(Yolo, video_path, output_path, input_size=YOLO_INPUT_SIZE, show
     cv2.destroyAllWindows()
 
 # detect from webcam
-def detect_realtime(Yolo, output_path, input_size=YOLO_INPUT_SIZE, show=False, CLASSES=YOLO_COCO_CLASSES, score_threshold=0.3, iou_threshold=0.3, rectangle_colors='', ALGORAND_WALLET=''):
+def detect_realtime(Yolo, output_path, camera_id, input_size=YOLO_INPUT_SIZE, show=False, CLASSES=YOLO_COCO_CLASSES, score_threshold=0.5, iou_threshold=0.3, rectangle_colors='', ALGORAND_WALLET=''):
     times, times_2 = [], []
-    vid = cv2.VideoCapture(0)
+	
+    vid = cv2.VideoCapture(int(camera_id))
 
     # by default VideoCapture returns float instead of int
     # width = int(vid.get(cv2.CAP_PROP_FRAME_WIDTH))
@@ -859,6 +861,11 @@ def detect_realtime(Yolo, output_path, input_size=YOLO_INPUT_SIZE, show=False, C
     totalUnsuccessfulFormula = "=COUNTIF($D$2:$D$500000,\"[]\")"
     rateOfSuccess = "=(INDIRECT(ADDRESS(ROW(),8))-INDIRECT(ADDRESS(ROW(),9)))/INDIRECT(ADDRESS(ROW(),8))"
     videoRecordIncrementor = 0
+    g = geocoder.ip('me')
+    geolocator = Nominatim(user_agent="http")
+    cords = str(g.lat) + "," + str(g.lng)
+    loc = geolocator.reverse(cords)
+    city = loc.raw.get('address').get('city')
     min_frames_thresh = 10
     frameThreshold = 15
     species_frame_count = 0
@@ -989,8 +996,6 @@ def detect_realtime(Yolo, output_path, input_size=YOLO_INPUT_SIZE, show=False, C
                 cv2.rectangle(blk, (width-225, 50), (width-20, 80), (255, 255, 255), cv2.FILLED)
                 
                 birdCountMax = birdCount
-				
-                g = geocoder.ip('me')
             
                 url = POWER_URL
             
@@ -1011,6 +1016,8 @@ def detect_realtime(Yolo, output_path, input_size=YOLO_INPUT_SIZE, show=False, C
                 "Bird_Species_Array": str(temp_species_array),
                 "Approximate_Lat": str(g.lat),
                 "Approximate_Long": str(g.lng),
+                "Approximate_Location": str(loc),
+                "Approximate_City": str(city),
                 "Number_of_Birds": str(birdCount),
                 "Duration_of_Sighting_(Seconds)": str(durationSighting)
                 }

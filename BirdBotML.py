@@ -17,6 +17,7 @@ import numpy as np
 import tensorflow as tf
 import subprocess
 import yolov3.twitch_speaker as TCI
+import tkinter as tk
 from tkinter import *
 from tkinter import filedialog
 from yolov3.utils import detect_image, detect_realtime, detect_video, detect_ip_camera, Load_Yolo_model, detect_video_realtime_mp, generate_ml_data
@@ -40,11 +41,13 @@ def processVideo():
 def RealTimeMode():
     Wallet_Input = ALGORAND_WALLET_LABEL.get("1.0", "end-1c")
     Camera_Input = BIRDBOT_CAMERA_LABEL.get("1.0", "end-1c")
+    Camera_ID_Input = current_value.get()
+    print(Camera_ID_Input)
     Wallet = open(cwd + "\yolov3\wallet.py", "w")
     Wallet.write("BIRDBOT_CAMERA_NAME         = " + "\'" + Camera_Input + "\'" + "\n")
     Wallet.write("ALGORAND_WALLET             = " + "\'" + Wallet_Input + "\'")
     Wallet.close()
-    detect_realtime(yolo, './YOLO_Videos/', input_size=YOLO_INPUT_SIZE, show=True, CLASSES=TRAIN_CLASSES, rectangle_colors=(255, 0, 0), ALGORAND_WALLET=Wallet_Input)
+    detect_realtime(yolo, './YOLO_Videos/', camera_id=Camera_ID_Input, input_size=YOLO_INPUT_SIZE, show=True, CLASSES=TRAIN_CLASSES, rectangle_colors=(255, 0, 0), ALGORAND_WALLET=Wallet_Input)
 	
 def IPCameraMode():
     detect_ip_camera(yolo, './YOLO_Videos/', input_size=YOLO_INPUT_SIZE, show=True, CLASSES=TRAIN_CLASSES, rectangle_colors=(255, 0, 0))
@@ -64,7 +67,7 @@ window = Tk()
 window.title('BirdBot ML Software Explorer')
 
 # Set window size
-window.geometry("700x500")
+window.geometry("700x600")
 
 #Set window background color
 window.config(background = "white")
@@ -78,16 +81,23 @@ label_file_explorer = Label(window,
 ALGORAND_WALLET_LABEL = Text(window, height = 1, width = 60)
 ALGORAND_WALLET_LABEL.insert(1.0, ALGORAND_WALLET)
  
-# Create label
+# Create Wallet label
 algorand_label = Label(window, text = "Algorand Wallet - Optional")
 algorand_label.config(font =("Courier", 10))
 
 BIRDBOT_CAMERA_LABEL = Text(window, height = 1, width = 60)
 BIRDBOT_CAMERA_LABEL.insert(1.0, BIRDBOT_CAMERA_NAME)
  
-# Create label
+# Create Camera Name label
 camera_label = Label(window, text = "Camera Name - Optional")
 camera_label.config(font =("Courier", 10))
+
+current_value = tk.StringVar(value=0)
+Camera_ID_SpinBox = Spinbox(window, from_ = 0, to = 4, textvariable=current_value, wrap=True)
+ 
+# Create Camera ID label
+camera_id_label = Label(window, text = "Camera ID - For switching cameras")
+camera_id_label.config(font =("Courier", 10))
 
 button_process_video = Button(window,
                         text = "Process Video",
@@ -119,13 +129,17 @@ camera_label.grid(row = 3, column = 0, columnspan = 2, pady = 5)
 
 BIRDBOT_CAMERA_LABEL.grid(row = 4, column = 0, columnspan = 2, pady = 5)
 
-button_process_video.grid(row = 5, column = 0, columnspan = 2, pady = 5)
+camera_id_label.grid(row = 5, column = 0, columnspan = 2, pady = 5)
 
-button_realtime_mode.grid(row = 6, column = 0, columnspan = 2, pady = 5)
+Camera_ID_SpinBox.grid(row = 6, column = 0, columnspan = 2, pady = 5)
 
-button_ip_camera_mode.grid(row = 7, column = 0, columnspan = 2, pady = 5)
+button_process_video.grid(row = 7, column = 0, columnspan = 2, pady = 5)
 
-button_exit.grid(row = 8, column = 0, columnspan = 2, pady = 5)
+button_realtime_mode.grid(row = 8, column = 0, columnspan = 2, pady = 5)
+
+button_ip_camera_mode.grid(row = 9, column = 0, columnspan = 2, pady = 5)
+
+button_exit.grid(row = 10, column = 0, columnspan = 2, pady = 5)
 
 os.system('cls')
 
