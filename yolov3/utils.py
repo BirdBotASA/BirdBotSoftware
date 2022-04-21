@@ -837,20 +837,18 @@ def detect_video(Yolo, video_path, output_path, input_size=YOLO_INPUT_SIZE, show
         
         # The conditional to write a train file which is anytime the object detector doesn't see anything
         if not currentSpecies and WRITE_VIDEO_TRAIN_FILE:
-            # train.write(image)
+            train.write(image)
         
         # The conditionals to write guess videos which is when the object detector sees something plus 2 seconds
         if videoRecordIncrementor > frameCount and WRITE_VIDEO_GUESS_FILE:
-            # guess.write(guess_copy)
+            guess.write(guess_copy)
         elif videoRecordIncrementor == frameCount and WRITE_VIDEO_GUESS_FILE:
-            # guess.release()
+            guess.release()
             timeWithoutDate = str(current_time[-11:])
             timeWithoutDate = timeWithoutDate.replace(':','-')
-            # os.rename(output_path[:-4] + '-Guess.mp4', 'YOLO_Videos/' + lastMaxSpecies + '-Guess' + '-' + str(current_time[:-9]) + '-' + timeWithoutDate + '.mp4')
-            # guess = cv2.VideoWriter(str(output_path[:-4] + '-Guess.mp4'), codec, fps, (width, height))
-            # TWITCH_SEEN_MESSAGE = 'BirdBot is ' + str("{:.2f}".format(mean(currentScore) * 100)) + '% confident it saw ' + str(temp_species_array) + ' from ' + str(start_time) + ' to ' + str(current_time)
-            # connection.send('BirdBotML', TWITCH_SEEN_MESSAGE)
-            
+            os.rename(output_path[:-4] + '-Guess.mp4', 'YOLO_Videos/' + lastMaxSpecies + '-Guess' + '-' + str(current_time[:-9]) + '-' + timeWithoutDate + '.mp4')
+            guess = cv2.VideoWriter(str(output_path[:-4] + '-Guess.mp4'), codec, fps, (width, height))
+
             # Reset temp variables
             currentScore = []
             temp_species_array =[]
@@ -883,15 +881,6 @@ def detect_realtime(Yolo, output_path, input_size=YOLO_INPUT_SIZE, show=False, C
     print(height)
     fps = int(vid.get(cv2.CAP_PROP_FPS))
     codec = cv2.VideoWriter_fourcc(*'mp4v')
-    
-    if WRITE_VIDEO_OUTPUT_FILE:
-        out = cv2.VideoWriter(output_path, codec, fps, (width, height)) # output_path must be .mp4
-    
-    if WRITE_VIDEO_TRAIN_FILE:
-        train = cv2.VideoWriter(str(output_path[:-4] + '-Train.mp4'), codec, fps, (width, height)) # output_path must be .mp4
-        
-    if WRITE_VIDEO_GUESS_FILE:
-        guess = cv2.VideoWriter(str(output_path[:-4] + '-Guess.mp4'), codec, fps, (width, height)) # output_path must be .mp4
     
     frameCount = 0
     totalDailySightingFormula = "=COUNTIF($A$2:$A$500000,INDIRECT(ADDRESS(ROW(),1)))"
@@ -954,13 +943,6 @@ def detect_realtime(Yolo, output_path, input_size=YOLO_INPUT_SIZE, show=False, C
         current_time_delta = time.time()
         
         if image is None:
-            if WRITE_VIDEO_OUTPUT_FILE:
-                out.release()
-            if WRITE_VIDEO_TRAIN_FILE:
-                train.release()
-            if WRITE_VIDEO_GUESS_FILE:
-                guess.release()
-                os.rename(output_path[:-4] + '-Guess.mp4', 'YOLO_Videos/' + max(seen_species_array) + '-Guess' + str(videoRecordIncrementor) + '.mp4')
             cv2.destroyAllWindows()
             print("END OF VIDEO")
             break
@@ -1124,19 +1106,12 @@ def detect_realtime(Yolo, output_path, input_size=YOLO_INPUT_SIZE, show=False, C
         
         # print("Time: {:.2f}ms, Detection FPS: {:.1f}, total FPS: {:.1f}".format(ms, fps, fps2))
         
-        # The conditional to write a train file which is anytime the object detector doesn't see anything
-        if not currentSpecies and WRITE_VIDEO_TRAIN_FILE:
-        
-            train.write(image)
-        
         # The conditionals to write guess videos which is when the object detector sees something plus 2 seconds
         if videoRecordIncrementor > frameCount and WRITE_VIDEO_GUESS_FILE:
             
-            guess.write(guess_copy)
+            # guess.write(guess_copy)
             
         elif videoRecordIncrementor == frameCount and WRITE_VIDEO_GUESS_FILE:
-            
-            guess.release()
             
             birdSpeciesCount = len(temp_species_array)
             birdsTokenCalc = birdSpeciesCount * 5
@@ -1148,46 +1123,16 @@ def detect_realtime(Yolo, output_path, input_size=YOLO_INPUT_SIZE, show=False, C
             timeWithoutDate = str(current_time[-11:])
             timeWithoutDate = timeWithoutDate.replace(':','-')
             
-            os.rename(output_path[:-4] + '-Guess.mp4', 'YOLO_Videos/' + lastMaxSpecies + '-Guess' + '-' + str(current_time[:-9]) + '-' + timeWithoutDate + '.mp4')
-            
-            guess = cv2.VideoWriter(str(output_path[:-4] + '-Guess.mp4'), codec, fps, (width, height))
-            
-            connection = TCI.TwitchChatIRC()
-            TWITCH_SEEN_MESSAGE = 'BirdBot is ' + str("{:.2f}".format(mean(currentScore) * 100)) + '% confident it saw ' + str(temp_species_array) + ' from ' + str(start_time) + ' to ' + str(current_time)
-            connection.send('BirdBotML', TWITCH_SEEN_MESSAGE)
-            connection.close_connection()
-            
-            if first_guess == True:
-            
-                with open('E:\TensorFlow2\BirdGuesses.csv', newline='') as f:
-                    reader = csv.reader(f)
-                    rowID = 0
-                    for row in reader:
-                        try:
-                            row1 = row[0]
-                        except:
-                            row1 = False
-
-            with open('E:\TensorFlow2\BirdGuesses.csv', 'a', newline='') as file:
-                
-                writer = csv.writer(file)
-                
-                if row1 == False and rowID == 0:
-                    writer.writerow(["SightingDate", "Time-24H", "BirdBot Camera", "Bird Species", "Number of Birds", "Duration of Sighting (Seconds)", "Total Sightings Today, Total Sightings, Total Unsuccessful Sightings, Percentage Success"])
-                    rowID += 1
-                
-                writer.writerow([csv_date, csv_time, BIRDBOT_CAMERA_NAME, temp_species_array, len(temp_species_array), current_time_delta - start_time_delta, totalDailySightingFormula, totalSightingsFormula, totalUnsuccessfulFormula, rateOfSuccess])
-                
-                # Copies csv to OneDrive, replace with universal database
-                shutil.copy(r'E:\TensorFlow2\BirdGuesses.csv', r'C:\Users\Tyler\OneDrive\BirdGuesses.csv')
+            # connection = TCI.TwitchChatIRC()
+            # TWITCH_SEEN_MESSAGE = 'BirdBot is ' + str("{:.2f}".format(mean(currentScore) * 100)) + '% confident it saw ' + str(temp_species_array) + ' from ' + str(start_time) + ' to ' + str(current_time)
+            # connection.send('BirdBotML', TWITCH_SEEN_MESSAGE)
+            # connection.close_connection()
                 
             # Reset temp variables
             currentScore = []
             temp_species_array =[]
             first_guess = False
-            
-        if WRITE_VIDEO_OUTPUT_FILE:
-            out.write(image)
+
         if show:
             cv2.imshow('output', image)
             if cv2.waitKey(1) & 0xFF == ord("q"):
