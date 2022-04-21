@@ -8,7 +8,7 @@ This is the repository for the BirdBotASA machine learning software. BirdBot sof
   - DOWNLOAD AND INSTALL MINICONDA 3.8 (MacOS Version): https://repo.anaconda.com/miniconda/Miniconda3-py38_4.11.0-MacOSX-x86_64.pkg
   - DOWNLOAD AND INSTALL MINICONDA 3.8 (Linux Version): https://repo.anaconda.com/miniconda/Miniconda3-py38_4.11.0-Linux-x86_64.sh
 
-- DOWNLOAD BIRDBOT AND PLACE ON DESKTOP: https://github.com/BirdBotASA/BirdBotWindows/archive/refs/heads/main.zip
+- DOWNLOAD BIRDBOT AND PLACE ON DESKTOP: https://github.com/BirdBotASA/BirdBotSoftware/archive/refs/heads/main.zip
 
 ## **2. OPEN MINICONDA THEN FOLLOW INSTRUCTIONS BELOW**
 
