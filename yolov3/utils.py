@@ -16,8 +16,10 @@ import random
 import numpy as np
 import textwrap
 # import vlc
+import base64
 import json
 import re
+import geocoder
 import requests
 import subprocess
 import tensorflow as tf
@@ -853,8 +855,6 @@ def detect_video(Yolo, video_path, output_path, input_size=YOLO_INPUT_SIZE, show
             currentScore = []
             temp_species_array =[]
             
-        if WRITE_VIDEO_OUTPUT_FILE:
-            # out.write(image)
         if show:
             cv2.imshow('output', image)
             if cv2.waitKey(1) & 0xFF == ord("q"):
@@ -868,9 +868,9 @@ def detect_video(Yolo, video_path, output_path, input_size=YOLO_INPUT_SIZE, show
     cv2.destroyAllWindows()
 
 # detect from webcam
-def detect_realtime(Yolo, output_path, input_size=YOLO_INPUT_SIZE, show=False, CLASSES=YOLO_COCO_CLASSES, score_threshold=0.5, iou_threshold=0.3, rectangle_colors='', ALGORAND_WALLET=''):
+def detect_realtime(Yolo, output_path, input_size=YOLO_INPUT_SIZE, show=False, CLASSES=YOLO_COCO_CLASSES, score_threshold=0.3, iou_threshold=0.3, rectangle_colors='', ALGORAND_WALLET=''):
     times, times_2 = [], []
-    vid = cv2.VideoCapture(0)
+    vid = cv2.VideoCapture(1)
 
     # by default VideoCapture returns float instead of int
     # width = int(vid.get(cv2.CAP_PROP_FRAME_WIDTH))
@@ -940,6 +940,7 @@ def detect_realtime(Yolo, output_path, input_size=YOLO_INPUT_SIZE, show=False, C
         current_time = time.strftime("%m-%d-%Y %H:%M:%S", t)
         csv_date = time.strftime("%m-%d-%Y", t)
         csv_time = time.strftime("%H:%M:%S", t)
+        file_time = time.strftime("%H-%M-%S", t)
         current_time_delta = time.time()
         
         if image is None:
@@ -1122,11 +1123,8 @@ def detect_realtime(Yolo, output_path, input_size=YOLO_INPUT_SIZE, show=False, C
         # print("Time: {:.2f}ms, Detection FPS: {:.1f}, total FPS: {:.1f}".format(ms, fps, fps2))
         
         # The conditionals to write guess videos which is when the object detector sees something plus 2 seconds
-        if videoRecordIncrementor > frameCount and WRITE_VIDEO_GUESS_FILE:
             
-            # guess.write(guess_copy)
-            
-        elif videoRecordIncrementor == frameCount and WRITE_VIDEO_GUESS_FILE:
+        if videoRecordIncrementor == frameCount and WRITE_VIDEO_GUESS_FILE:
             
             birdSpeciesCount = len(temp_species_array)
             birdsTokenCalc = birdSpeciesCount * 5
