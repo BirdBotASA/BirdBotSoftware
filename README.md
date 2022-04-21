@@ -1,4 +1,4 @@
-# BirdBot Software
+# BirdBot Software - Supports Windows, MacOS, and Linux!
 This is the repository for the BirdBotASA machine learning software. BirdBot software is now launching a soft alpha which will allow people to run the software using any computer and camera hardware. Users can connect their Algorand Wallet as well as name their camera to be awarded BIRDS tokens daily.
 
 
