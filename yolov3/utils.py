@@ -43,6 +43,8 @@ for device in gpu_devices:
 # message = 'Hello everyone! I\'m here to make guesses!'
 # connection.send('BirdBotML', message)
 
+cwd = os.getcwd()
+
 def load_yolo_weights(model, weights_file):
     tf.keras.backend.clear_session() # used to reset layer names
     # load Darknet original weights to TensorFlow model
@@ -835,17 +837,17 @@ def detect_video(Yolo, video_path, output_path, input_size=YOLO_INPUT_SIZE, show
         
         # The conditional to write a train file which is anytime the object detector doesn't see anything
         if not currentSpecies and WRITE_VIDEO_TRAIN_FILE:
-            train.write(image)
+            # train.write(image)
         
         # The conditionals to write guess videos which is when the object detector sees something plus 2 seconds
         if videoRecordIncrementor > frameCount and WRITE_VIDEO_GUESS_FILE:
-            guess.write(guess_copy)
+            # guess.write(guess_copy)
         elif videoRecordIncrementor == frameCount and WRITE_VIDEO_GUESS_FILE:
-            guess.release()
+            # guess.release()
             timeWithoutDate = str(current_time[-11:])
             timeWithoutDate = timeWithoutDate.replace(':','-')
-            os.rename(output_path[:-4] + '-Guess.mp4', 'YOLO_Videos/' + lastMaxSpecies + '-Guess' + '-' + str(current_time[:-9]) + '-' + timeWithoutDate + '.mp4')
-            guess = cv2.VideoWriter(str(output_path[:-4] + '-Guess.mp4'), codec, fps, (width, height))
+            # os.rename(output_path[:-4] + '-Guess.mp4', 'YOLO_Videos/' + lastMaxSpecies + '-Guess' + '-' + str(current_time[:-9]) + '-' + timeWithoutDate + '.mp4')
+            # guess = cv2.VideoWriter(str(output_path[:-4] + '-Guess.mp4'), codec, fps, (width, height))
             # TWITCH_SEEN_MESSAGE = 'BirdBot is ' + str("{:.2f}".format(mean(currentScore) * 100)) + '% confident it saw ' + str(temp_species_array) + ' from ' + str(start_time) + ' to ' + str(current_time)
             # connection.send('BirdBotML', TWITCH_SEEN_MESSAGE)
             
@@ -854,7 +856,7 @@ def detect_video(Yolo, video_path, output_path, input_size=YOLO_INPUT_SIZE, show
             temp_species_array =[]
             
         if WRITE_VIDEO_OUTPUT_FILE:
-            out.write(image)
+            # out.write(image)
         if show:
             cv2.imshow('output', image)
             if cv2.waitKey(1) & 0xFF == ord("q"):
