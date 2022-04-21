@@ -24,7 +24,7 @@ OPEN MINICONDA THEN FOLLOW INSTRUCTIONS BELOW
 
 4.) Install package requirements for BirdBotML.py and TensorFlow 2.3.1
 
-➡ pip install -r ./requirements.txt
+➡ pip install -r requirements.txt
 
 AFTER SUCCESSFUL INSTALL
 
