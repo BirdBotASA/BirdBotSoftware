@@ -992,6 +992,17 @@ def detect_realtime(Yolo, output_path, input_size=YOLO_INPUT_SIZE, show=False, C
             
             if (len(temp_species_array) <= i and approval_species_array.count(currentSpecies) >= min_frames_thresh) or (currentSpecies not in temp_species_array and approval_species_array.count(currentSpecies) >= min_frames_thresh):
                 
+                tempPhotoName = ALGORAND_WALLET[0:10] + "-" + str(currentSpecies.replace(" ", "-")) + "-" + str(file_time) + ".jpg"
+                tempPhotoLoc = cwd + "/" + ALGORAND_WALLET[0:10] + "-" + str(currentSpecies.replace(" ", "-")) + "-" + str(file_time) + ".jpg"
+                        
+                cv2.imwrite(tempPhotoLoc, image)
+                
+                with open(tempPhotoName, "rb") as img_file:
+                    BirdBotPhotoBase64 = base64.b64encode(img_file.read()).decode('utf-8')
+                    img_file.close()
+                    os.remove(tempPhotoLoc)
+                # print(BirdBotPhotoBase64)
+                
                 temp_species_array.append(currentSpecies)
                 last_temp_species_array = "Last seen: " + str(temp_species_array)
                 last_array_textsize = cv2.getTextSize(last_temp_species_array, cv2.FONT_HERSHEY_COMPLEX_SMALL, fontScale, bbox_thick)[0]
@@ -1006,8 +1017,10 @@ def detect_realtime(Yolo, output_path, input_size=YOLO_INPUT_SIZE, show=False, C
                 cv2.rectangle(blk, (width-225, 50), (width-20, 80), (255, 255, 255), cv2.FILLED)
                 
                 birdCountMax = birdCount
+				
+                g = geocoder.ip('me')
             
-                url = 'https://prod-91.westus.logic.azure.com:443/workflows/a46e3ec6a59747f38571af83d23d25b4/triggers/manual/paths/invoke?api-version=2016-06-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=Qs-yjUpIAHxbnM51sT8_GfhR__1q_UtM9M0Cl6zWSbQ'
+                url = POWER_URL
             
                 BirdBotHeaders = {'Content-type': 'application/json', 'Accept': 'text/plain'}
                 
@@ -1016,16 +1029,18 @@ def detect_realtime(Yolo, output_path, input_size=YOLO_INPUT_SIZE, show=False, C
                 durationSighting = current_time_delta - start_time_delta
                 
                 BirdBotData = {
-                'Date': csv_date,
-                'Time': csv_time,
-                'BIRDS_Earned': birdsEarned,
-                'Algorand_Wallet': '7CZWBAQWRRXQEPRU62MKZXKLSAMCPP6VCAQMOMZT7XN3EXPM52ZTTXGRLE',
-                'BirdBot_Camera': str(BIRDBOT_CAMERA_NAME),
-                'Bird_Species_Triggered': str(currentSpecies),
-                'Bird_Photo': '2121.jpg',
-                'Bird_Species_Array': str(approval_species_array),
-                'Number_of_Birds': birdCount,
-                'Duration_of_Sighting_(Seconds)': durationSighting
+                "Date": str(csv_date),
+                "Time": str(csv_time),
+                "BIRDS_Earned": str(birdsEarned),
+                "Algorand_Wallet": str(ALGORAND_WALLET),
+                "BirdBot_Camera": str(BIRDBOT_CAMERA_NAME),
+                "Bird_Species_Triggered": str(currentSpecies),
+                "Bird_Photo": str(BirdBotPhotoBase64),
+                "Bird_Species_Array": str(temp_species_array),
+                "Approximate_Lat": str(g.lat),
+                "Approximate_Long": str(g.lng),
+                "Number_of_Birds": str(birdCount),
+                "Duration_of_Sighting_(Seconds)": str(durationSighting)
                 }
 
                 BirdBotDataLog = requests.post(url, json=BirdBotData, headers=BirdBotHeaders)
