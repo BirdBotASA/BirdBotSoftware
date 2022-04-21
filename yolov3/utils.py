@@ -15,7 +15,7 @@ import time, queue, threading
 import random
 import numpy as np
 import textwrap
-import vlc
+# import vlc
 import json
 import re
 import requests
