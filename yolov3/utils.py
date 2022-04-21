@@ -788,33 +788,6 @@ def detect_video(Yolo, video_path, output_path, input_size=YOLO_INPUT_SIZE, show
         
         birdCount = len(bboxes)
         
-        if birdCount > birdCountMax:
-        
-            birdCountMax = birdCount
-            
-            url = 'https://prod-91.westus.logic.azure.com:443/workflows/a46e3ec6a59747f38571af83d23d25b4/triggers/manual/paths/invoke?api-version=2016-06-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=Qs-yjUpIAHxbnM51sT8_GfhR__1q_UtM9M0Cl6zWSbQ'
-            
-            BirdBotHeaders = {'Content-type': 'application/json', 'Accept': 'text/plain'}
-            
-            # print(currentSpecies)
-            
-            BirdBotData = {
-                'Date': csv_date,
-                'Time': csv_time,
-                'BIRDS_Earned': birdsEarned,
-                'Algorand_Wallet': ALGORAND_WALLET,
-                'BirdBot_Camera': str(BIRDBOT_CAMERA_NAME),
-                'Bird_Species_Triggered': str(currentSpecies),
-                'Bird_Photo': '2121.jpg',
-                'Bird_Species_Array': str(approval_species_array),
-                'Number_of_Birds': birdCount,
-                'Duration_of_Sighting_(Seconds)': "15.10364938"
-            }
-
-            # BirdBotDataLog = requests.post(url, json=BirdBotData, headers=BirdBotHeaders) #UNCOMMENT TO SEND TO DB
-            
-            # print(BirdBotDataLog)
-        
         t3 = time.time()
         times.append(t2-t1)
         times_2.append(t3-t1)
