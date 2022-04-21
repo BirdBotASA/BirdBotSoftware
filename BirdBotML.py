@@ -31,6 +31,8 @@ yolo = Load_Yolo_model()
 
 #detect_video_realtime_mp(video_path, "Output.mp4", input_size=YOLO_INPUT_SIZE, show=True, CLASSES=TRAIN_CLASSES, rectangle_colors=(255,0,0), realtime=False)
 
+cwd = os.getcwd()
+
 def processVideo():
     video_path = filedialog.askopenfilename(initialdir = "./YOLO_Videos/", title = "Select a Video File",filetypes = (("all video format","*.mp4*"),("all files","*.*")))
     detect_video(yolo, video_path, video_path[:-4] + '-ML.mp4', input_size=YOLO_INPUT_SIZE, show=True, CLASSES=TRAIN_CLASSES, rectangle_colors=(255,0,0), HatMode=HAT_MODE)
@@ -38,7 +40,7 @@ def processVideo():
 def RealTimeMode():
     Wallet_Input = ALGORAND_WALLET_LABEL.get("1.0", "end-1c")
     Camera_Input = BIRDBOT_CAMERA_LABEL.get("1.0", "end-1c")
-    Wallet = open("B:\BirdBot\BirdKeras\TensorFlow2\yolov3\wallet.py", "w")
+    Wallet = open(cwd + "\yolov3\wallet.py", "w")
     Wallet.write("BIRDBOT_CAMERA_NAME         = " + "\'" + Camera_Input + "\'" + "\n")
     Wallet.write("ALGORAND_WALLET             = " + "\'" + Wallet_Input + "\'")
     Wallet.close()
