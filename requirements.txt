@@ -19,3 +19,4 @@ emoji
 python-decouple
 python-vlc
 pytesseract
+ttkbootstrap
