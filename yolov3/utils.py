@@ -242,11 +242,16 @@ def draw_bbox(image, bboxes, CLASSES=YOLO_COCO_CLASSES, show_label=True, show_co
         # print(class_ind)
         
         # print(str(NUM_CLASS[class_ind]))
-        
-        if NUM_CLASS[class_ind] == 'American Goldfinch':
+        if NUM_CLASS[class_ind] == 'American Crow':
+            rectangle_colors = (30,30,30)
+        elif NUM_CLASS[class_ind] == 'American Goldfinch':
             rectangle_colors = (150,255,255)
         elif NUM_CLASS[class_ind] == 'American Robin':
             rectangle_colors = (54,101,163)
+        elif NUM_CLASS[class_ind] == 'Bald Eagle':
+            rectangle_colors = (25,95,130)
+        elif NUM_CLASS[class_ind] == 'Black Vulture':
+            rectangle_colors = (25,30,30)
         elif NUM_CLASS[class_ind] == 'Black-capped Chickadee':
             rectangle_colors = (23,29,29)
         elif NUM_CLASS[class_ind] == 'Black-crested Titmouse':
@@ -255,30 +260,66 @@ def draw_bbox(image, bboxes, CLASSES=YOLO_COCO_CLASSES, show_label=True, show_co
             rectangle_colors = (0,106,188)
         elif NUM_CLASS[class_ind] == 'Black-headed Grosbeak - Female':
             rectangle_colors = (50,150,220)
+        elif NUM_CLASS[class_ind] == 'Blue Jay':
+            rectangle_colors = (160,95,35)
+        elif NUM_CLASS[class_ind] == 'Carolina Wren':
+            rectangle_colors = (75,135,180)
         elif NUM_CLASS[class_ind] == 'Chestnut-backed Chickadee':
             rectangle_colors = (24,70,87)
+        elif NUM_CLASS[class_ind] == 'Chipping Sparrow':
+            rectangle_colors = (50,110,155)
         elif NUM_CLASS[class_ind] == 'Dark-eyed Junco':
             rectangle_colors = (57,47,45)
+        elif NUM_CLASS[class_ind] == 'Downy Woodpecker':
+            rectangle_colors = (56,69,79)
+        elif NUM_CLASS[class_ind] == 'Eastern Bluebird':
+            rectangle_colors = (235,155,73)
+        elif NUM_CLASS[class_ind] == 'Eastern Phoebe':
+            rectangle_colors = (125,125,125)
+        elif NUM_CLASS[class_ind] == 'Eastern Towhee':
+            rectangle_colors = (15,105,200)
         elif NUM_CLASS[class_ind] == 'European Starling':
             rectangle_colors = (96,96,96)
         elif NUM_CLASS[class_ind] == 'Golden-crowned Sparrow':
             rectangle_colors = (0,215,215)
+        elif NUM_CLASS[class_ind] == 'Grey Catbird':
+            rectangle_colors = (175,175,175)
         elif NUM_CLASS[class_ind] == 'House Finch - Male':
             rectangle_colors = (212,170,255)
         elif NUM_CLASS[class_ind] == 'House Finch - Female':
             rectangle_colors = (126,139,155)
         elif NUM_CLASS[class_ind] == 'House Sparrow':
             rectangle_colors = (10,66,89)
+        elif NUM_CLASS[class_ind] == 'Indigo Bunting':
+            rectangle_colors = (0,95,190)
+        elif NUM_CLASS[class_ind] == 'Mourning Dove':
+            rectangle_colors = (205,175,85)
+        elif NUM_CLASS[class_ind] == 'Northern Cardinal':
+            rectangle_colors = (30,30,235)
         elif NUM_CLASS[class_ind] == 'Northern Flicker':
             rectangle_colors = (138,144,177)
+        elif NUM_CLASS[class_ind] == 'Northern Mockingbird':
+            rectangle_colors = (204,204,204)
+        elif NUM_CLASS[class_ind] == 'Osprey':
+            rectangle_colors = (66,98,117)
+        elif NUM_CLASS[class_ind] == 'Osprey - Chick':
+            rectangle_colors = (121,142,155)
+        elif NUM_CLASS[class_ind] == 'Osprey - Egg':
+            rectangle_colors = (145,176,196)
         elif NUM_CLASS[class_ind] == 'Pine Siskin':
             rectangle_colors = (137,110,97)
+        elif NUM_CLASS[class_ind] == 'Pine Warbler':
+            rectangle_colors = (0,255,255)
         elif NUM_CLASS[class_ind] == 'Purple Finch':
             rectangle_colors = (117,30,220)
         elif NUM_CLASS[class_ind] == 'Red-breasted Nuthatch':
             rectangle_colors = (58,95,196)
+        elif NUM_CLASS[class_ind] == 'Red-winged Blackbird':
+            rectangle_colors = (25,25,25)
         elif NUM_CLASS[class_ind] == 'Ruby-crowned Kinglet':
             rectangle_colors = (0,128,128)
+        elif NUM_CLASS[class_ind] == 'Ruby-throated Hummingbird':
+            rectangle_colors = (8,214,8)
         elif NUM_CLASS[class_ind] == 'Steller\'s Jay':
             rectangle_colors = (191,95,0)
         elif NUM_CLASS[class_ind] == 'Spotted Towhee':
@@ -287,12 +328,10 @@ def draw_bbox(image, bboxes, CLASSES=YOLO_COCO_CLASSES, show_label=True, show_co
             rectangle_colors = (10,255,0)
         elif NUM_CLASS[class_ind] == 'Townsend\'s Warbler':
             rectangle_colors = (53,214,255)
-        elif NUM_CLASS[class_ind] == 'Black Vulture':
-            rectangle_colors = (22,22,22)
+        elif NUM_CLASS[class_ind] == 'Tufted Titmouse':
+            rectangle_colors = (75,75,75)
         elif NUM_CLASS[class_ind] == 'Turkey Vulture':
             rectangle_colors = (0,95,142)
-        elif NUM_CLASS[class_ind] == 'Osprey':
-            rectangle_colors = (66,98,117)
         elif NUM_CLASS[class_ind] == 'Bald Eagle':
             rectangle_colors = (213,209,205)
         else:
@@ -974,7 +1013,7 @@ def detect_realtime(Yolo, output_path, camera_id, input_size=YOLO_INPUT_SIZE, sh
                 tempPhotoName = ALGORAND_WALLET[0:10] + "-" + str(currentSpecies.replace(" ", "-")) + "-" + str(file_time) + ".jpg"
                 tempPhotoLoc = cwd + "/" + ALGORAND_WALLET[0:10] + "-" + str(currentSpecies.replace(" ", "-")) + "-" + str(file_time) + ".jpg"
                         
-                cv2.imwrite(tempPhotoLoc, image)
+                cv2.imwrite(tempPhotoLoc, guess_copy)
                 
                 with open(tempPhotoName, "rb") as img_file:
                     BirdBotPhotoBase64 = base64.b64encode(img_file.read()).decode('utf-8')

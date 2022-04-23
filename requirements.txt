@@ -5,6 +5,8 @@ seaborn>=0.10.0
 tensorflow==2.3.1
 opencv-python==4.1.2.30
 tqdm==4.43.0
+PyQtWebEngine
+PySide2
 pandas
 geocoder
 geopy
