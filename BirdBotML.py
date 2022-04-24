@@ -12,14 +12,16 @@
 #================================================================
 
 import os
+from turtle import bgcolor
 import cv2
 import numpy as np
 import tensorflow as tf
 import subprocess
 import yolov3.twitch_speaker as TCI
-import tkinter as tk
 from tkinter import *
 from tkinter import filedialog
+import ttkbootstrap as ttk
+#from ttkbootstrap.constants import *
 from yolov3.utils import detect_image, detect_realtime, detect_video, detect_ip_camera, Load_Yolo_model, detect_video_realtime_mp, generate_ml_data
 from yolov3.twitch_listener import Bot
 from yolov3.configs import *
@@ -42,12 +44,11 @@ def RealTimeMode():
     Wallet_Input = ALGORAND_WALLET_LABEL.get("1.0", "end-1c")
     Camera_Input = BIRDBOT_CAMERA_LABEL.get("1.0", "end-1c")
     Camera_ID_Input = current_value.get()
-    print(Camera_ID_Input)
     Wallet = open(cwd + "\yolov3\wallet.py", "w")
     Wallet.write("BIRDBOT_CAMERA_NAME         = " + "\'" + Camera_Input + "\'" + "\n")
     Wallet.write("ALGORAND_WALLET             = " + "\'" + Wallet_Input + "\'")
     Wallet.close()
-    detect_realtime(yolo, './YOLO_Videos/', camera_id=Camera_ID_Input, input_size=YOLO_INPUT_SIZE, show=True, CLASSES=TRAIN_CLASSES, rectangle_colors=(255, 0, 0), ALGORAND_WALLET=Wallet_Input)
+    detect_realtime(yolo, './YOLO_Videos/', Camera_ID_Input, input_size=YOLO_INPUT_SIZE, show=True, CLASSES=TRAIN_CLASSES, rectangle_colors=(255, 0, 0), ALGORAND_WALLET=Wallet_Input)
 	
 def IPCameraMode():
     detect_ip_camera(yolo, './YOLO_Videos/', input_size=YOLO_INPUT_SIZE, show=True, CLASSES=TRAIN_CLASSES, rectangle_colors=(255, 0, 0))
@@ -59,87 +60,97 @@ def callback(indata, outdata, frames, time, status):
 
 def exit():
 	exit()
-    
-# Create the root window
-window = Tk()
 
-# Set window title
-window.title('BirdBot ML Software Explorer')
 
-# Set window size
-window.geometry("700x600")
+# Create Root Window
+window = ttk.Window()
+window.title('BirdBot ML Explorer')
+window_width = 375
+window_height = 800
+window.resizable(False, False)
 
-#Set window background color
-window.config(background = "white")
+# Set Position of Window to Center of Screen
+screen_width = window.winfo_screenwidth()
+screen_height = window.winfo_screenheight()
+center_x = int(screen_width/2 - window_width / 2)
+center_y = int(screen_height/2 - window_height / 2)
+window.geometry(f'{window_width}x{window_height}+{center_x}+{center_y}')
 
-# Create a File Explorer label
-label_file_explorer = Label(window,
-                            text = "BirdBot Alpha ML Software - Please Use Buttons Below!",
-                            width = 100, height = 4,
-                            fg = "blue")     
+# Set Windows Icons
+window.iconbitmap('logo.ico')
 
-ALGORAND_WALLET_LABEL = Text(window, height = 1, width = 60)
-ALGORAND_WALLET_LABEL.insert(1.0, ALGORAND_WALLET)
- 
-# Create Wallet label
-algorand_label = Label(window, text = "Algorand Wallet - Optional")
-algorand_label.config(font =("Courier", 10))
+# BirdBot Logo
+img = PhotoImage(file='logo_dash.png')
+Label(window, image=img).pack(side=TOP)
 
-BIRDBOT_CAMERA_LABEL = Text(window, height = 1, width = 60)
+#GUI Banner
+header = Label(window, text = "BirdBot Alpha Software", font=("Roboto", 14), width = 100, height = 2)
+header.config(bg='#212121', fg='#ffffff')
+header.pack(pady=(0,10))
+
+# Camera Name
+camera_label = LabelFrame(window, text = "Camera Name (Optional)")
+camera_label.config(font =("Roboto", 10))
+camera_label.pack(side=TOP, pady=10, padx=10)
+
+BIRDBOT_CAMERA_LABEL = Text(camera_label, height = 1, width = 60)
 BIRDBOT_CAMERA_LABEL.insert(1.0, BIRDBOT_CAMERA_NAME)
- 
-# Create Camera Name label
-camera_label = Label(window, text = "Camera Name - Optional")
-camera_label.config(font =("Courier", 10))
+BIRDBOT_CAMERA_LABEL.pack(side=TOP, pady=10, padx=10)
 
-current_value = tk.StringVar(value=0)
-Camera_ID_SpinBox = Spinbox(window, from_ = 0, to = 4, textvariable=current_value, wrap=True)
- 
-# Create Camera ID label
-camera_id_label = Label(window, text = "Camera ID - For switching cameras")
-camera_id_label.config(font =("Courier", 10))
+# Camera ID
+current_value = ttk.StringVar(value=0)
 
-button_process_video = Button(window,
-                        text = "Process Video",
-                        command = processVideo)
-                        
-button_realtime_mode = Button(window,
-                        text = "Real-Time Mode",
-                        command = RealTimeMode)
-						
-button_ip_camera_mode = Button(window,
-                        text = "IP Camera Mode",
-                        command = IPCameraMode)
+# Algorand Wallet
+algorand_label = LabelFrame(window, text = "Algorand Wallet (Optional)")
+algorand_label.config(font =("Roboto", 10))
+algorand_label.pack(side=TOP, pady=10, padx=10)
 
-button_exit = Button(window,
-                    text = "Exit",
-                    command = exit)
+ALGORAND_WALLET_LABEL = Text(algorand_label, height = 2, width = 100)
+ALGORAND_WALLET_LABEL.insert(1.0, ALGORAND_WALLET)
+ALGORAND_WALLET_LABEL.pack(side=TOP, pady=(5,10), padx=10)
 
-# Grid method is chosen for placing
-# the widgets at respective positions
-# in a table like structure by
-# specifying rows and columns
-label_file_explorer.grid(row = 0, column = 0, pady = 10)
+# Camera Mode Buttons
 
-algorand_label.grid(row = 1, column = 0, columnspan = 2, pady = 5)
+btn1 = Button(window, text="Process Video", font=("Roboto", 12), command = processVideo)
+btn1.config(width = 100, height = 2, bg='#e5d04c', fg='#ffffff', activebackground="#eed195", activeforeground="#ffffff")
+btn1.pack(side=TOP, pady=(10,0))
 
-ALGORAND_WALLET_LABEL.grid(row = 2, column = 0, columnspan = 2, pady = 5)
+btn2 = Button(window, text="Real Time Mode", font=("Roboto", 12), command = RealTimeMode)
+btn2.config(width = 100, height = 2, bg='#e5d04c', fg='#ffffff', activebackground="#eed195", activeforeground="#ffffff")
+btn2.pack(side=TOP, pady=5)
 
-camera_label.grid(row = 3, column = 0, columnspan = 2, pady = 5)
+btn3 = Button(window, text="IP Camera Mode", font=("Roboto", 12), command = IPCameraMode)
+btn3.config(width = 100, height = 2, bg='#e5d04c', fg='#ffffff', activebackground="#eed195", activeforeground="#ffffff")
+btn3.pack(side=TOP)
 
-BIRDBOT_CAMERA_LABEL.grid(row = 4, column = 0, columnspan = 2, pady = 5)
+# Button Highlighting
 
-camera_id_label.grid(row = 5, column = 0, columnspan = 2, pady = 5)
+def enterBtn1(e):
+   btn1.config(background='#eed195', foreground= '#ffffff')
+def leaveBtn1(e):
+   btn1.config(background= '#e5d04c', foreground= '#ffffff')
 
-Camera_ID_SpinBox.grid(row = 6, column = 0, columnspan = 2, pady = 5)
+def enterBtn2(e):
+   btn2.config(background='#eed195', foreground= '#ffffff')
+def leaveBtn2(e):
+   btn2.config(background= '#e5d04c', foreground= '#ffffff')
 
-button_process_video.grid(row = 7, column = 0, columnspan = 2, pady = 5)
+def enterBtn3(e):
+   btn3.config(background='#eed195', foreground= '#ffffff')
+def leaveBtn3(e):
+   btn3.config(background= '#e5d04c', foreground= '#ffffff')
 
-button_realtime_mode.grid(row = 8, column = 0, columnspan = 2, pady = 5)
+btn1.bind('<Enter>', enterBtn1)
+btn1.bind('<Leave>', leaveBtn1)
+btn2.bind('<Enter>', enterBtn2)
+btn2.bind('<Leave>', leaveBtn2)
+btn3.bind('<Enter>', enterBtn3)
+btn3.bind('<Leave>', leaveBtn3)
 
-button_ip_camera_mode.grid(row = 9, column = 0, columnspan = 2, pady = 5)
-
-button_exit.grid(row = 10, column = 0, columnspan = 2, pady = 5)
+# GUI Footer
+footer = Label(window, text = "BirdBot Technology LLC, Tacoma, WA", font=("Roboto", 8), width = 100, height = 2)
+footer.config(bg='#212121', fg='#ffffff')
+footer.pack(side=BOTTOM)
 
 os.system('cls')
 
