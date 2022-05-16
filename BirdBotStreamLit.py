@@ -13,7 +13,7 @@ st.title('BirdBot - Machine Learning dApp')
 
 DATE_COLUMN = 'date/time'
 SPECIES_COLUMN = 'Bird_Species_Triggered'
-DATA_URL = ('B:\Downloads\BirdBotStreamLitData.csv')
+DATA_URL = ('BirdBotStreamLitData.csv')
 image = ''
 LABEL = ''
 
