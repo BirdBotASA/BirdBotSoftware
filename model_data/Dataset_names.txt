@@ -1,3 +1,4 @@
+Allen's Hummingbird
 American Crow
 Northern Mockingbird
 American Goldfinch
@@ -8,8 +9,12 @@ House Finch - Female
 Black-capped Chickadee
 Steller's Jay
 American Robin
+Eastern Towhee
+Anna's Hummingbird
 Bald Eagle
 Barn Swallow
+Cedar Waxwing
+Bewick's Wren
 Red-breasted Nuthatch
 Dark-eyed Junco
 Northern Flicker
@@ -20,29 +25,59 @@ Townsend's Warbler
 Black-crested Titmouse
 Black-headed Grosbeak
 Black-headed Grosbeak - Female
+Black Bear
+Black-billed Magpie
+Black_Phoebe
 Black Vulture
 Turkey Vulture
 Blue Jay
+Brewer's Blackbird
+Brown-headed Cowbird
+Bullock's Oriole
+Bushtit
+California Scrub-Jay
+California Towhee
 Carolina Wren
-Cedar Waxwing
 Ruby-crowned Kinglet
 Chipping Sparrow
+Common Grackle
+Common Raven
 Common Yellowthroat
+Cooper's Hawk
 Purple Finch
 Downy Woodpecker
+Tufted Titmouse
 Eastern Bluebird
 Eastern Phoebe
-Eastern Towhee
+Eurasian Collared-Dove
+Great-tailed Grackle
 Grey Catbird
-House Wren
-Indigo Bunting
-Mourning Dove
 Northern Cardinal
+House Fire
+House Wren
+Mourning Dove
+Indigo Bunting
+Mountain Chickadee
+Oak Titmouse
 Osprey
 Osprey - Chick
 Osprey - Egg
 Pine Warbler
 Red-winged Blackbird
+Red-shouldered Hawk
+Rock Pigeon
 Ruby-throated Hummingbird
+Rufous Hummingbird
+Say's Phoebe
+Song Sparrow
 Spotted Towhee
-Tufted Titmouse
+Verdin
+Western Bluebird
+Western Kingbird
+Western Meadowlark
+Western Tanager
+White-crowned Sparrow
+White-breasted Nuthatch
+Wild Boar
+Yellow_rumped_Warbler
+Yellow Warbler
