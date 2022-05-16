@@ -32,7 +32,6 @@ from datetime import datetime
 from yolov3.configs import *
 from yolov3.wallet import *
 from yolov3.yolov4 import *
-from yolov3.twitch_listener import *
 from tensorflow.python.saved_model import tag_constants
 from numpy import mean
 from PyQt5 import QtCore, QtGui, QtWidgets
@@ -619,12 +618,12 @@ def detect_image(Yolo, image_path, input_size=416, show=False, CLASSES=YOLO_COCO
 
     for x in LABEL:
         if len(LABEL) > counter:
-            write_label += x+", "
+            write_label += "ID #" + str(counter) + " - " + x + "\n"
             print("counter " + str(counter))
             print("length " + str(len(LABEL)))
             counter += 1
-        else:
-            write_label += x
+        else: 
+            write_label += "ID #" + str(counter) + " - " + x
 
 
     with open('label.txt', 'w') as label_file:

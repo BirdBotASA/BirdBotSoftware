@@ -56,15 +56,16 @@ if file:  # if user uploaded file
         with col2:
             st.subheader('BirdBot Image')
             st.image("temp.jpg")
-            time.sleep(3)
+            time.sleep(1)
             os.remove(file.name)
 
         with open('label.txt') as f:
             contents = f.read()
-        st.subheader('BirdBot Prediction: ' + '\n' + contents)
+        st.subheader('BirdBot Prediction:')
+        st.text(contents)
         st.markdown("""---""")
 
-st.subheader('Number of Wildlife Sightings by Hour - Local Time')
+st.subheader('Number of Wildlife Sightings by Hour - Global Data')
 
 hist_values = np.histogram(
     data[DATE_COLUMN].dt.hour, bins=24, range=(0,24))[0]
@@ -73,10 +74,10 @@ st.bar_chart(hist_values)
 
 st.markdown("""---""")
 
-st.subheader('Use slider to adjust time of day')
+st.subheader('Use Slider to Adjust Time of Day')
 hour_to_filter = st.slider('Hour', 0, 23, 17)  # min: 0h, max: 23h, default: 17h
 filtered_data = data[data[DATE_COLUMN].dt.hour == hour_to_filter]
-st.subheader(f'Map of all bird sightings at {hour_to_filter}:00')
+st.subheader(f'Map of all Wildlife Sightings at {hour_to_filter}:00')
 
 st.map(filtered_data)
 
