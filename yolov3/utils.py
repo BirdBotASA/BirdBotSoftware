@@ -221,10 +221,14 @@ def draw_hats(image, bboxes, random_file_array, hatCounter, CLASSES=YOLO_COCO_CL
         
     return image, hatCounter
     
-def draw_bbox(image, bboxes, CLASSES=YOLO_COCO_CLASSES, show_label=True, show_confidence = True, Text_colors=(255,255,255), rectangle_colors='', tracking=False):   
+def draw_bbox(image, bboxes, CLASSES=YOLO_COCO_CLASSES, show_label=True, draw_rect=False, show_confidence = True, Text_colors=(255,255,255), rectangle_colors='', tracking=False):   
     NUM_CLASS = read_class_names(CLASSES)
     num_classes = len(NUM_CLASS)
     image_h, image_w, _ = image.shape
+    scientific_name = ''
+    IUCN = ''
+    global LABEL
+    LABEL = []
     
     blue = []
     green = []
@@ -242,98 +246,187 @@ def draw_bbox(image, bboxes, CLASSES=YOLO_COCO_CLASSES, show_label=True, show_co
         # print(class_ind)
         
         # print(str(NUM_CLASS[class_ind]))
+        
         if NUM_CLASS[class_ind] == 'American Crow':
             rectangle_colors = (30,30,30)
+            scientific_name = 'Corvus brachyrhynchos'
+            IUCN = "Least Concern"
         elif NUM_CLASS[class_ind] == 'American Goldfinch':
             rectangle_colors = (150,255,255)
+            scientific_name = 'Spinus tristis'
+            IUCN = "Least Concern"
         elif NUM_CLASS[class_ind] == 'American Robin':
             rectangle_colors = (54,101,163)
+            scientific_name = 'Turdus migratorius'
+            IUCN = "Least Concern"
         elif NUM_CLASS[class_ind] == 'Bald Eagle':
             rectangle_colors = (25,95,130)
+            scientific_name = 'Haliaeetus leucocephalus'
+            IUCN = "Least Concern"
         elif NUM_CLASS[class_ind] == 'Black Vulture':
             rectangle_colors = (25,30,30)
+            scientific_name = 'Coragyps atratus'
+            IUCN = "Least Concern"
         elif NUM_CLASS[class_ind] == 'Black-capped Chickadee':
             rectangle_colors = (23,29,29)
+            scientific_name = 'Poecile atricapillus'
+            IUCN = "Least Concern"
         elif NUM_CLASS[class_ind] == 'Black-crested Titmouse':
             rectangle_colors = (90,90,90)
+            scientific_name = 'Baeolophus atricristatus'
+            IUCN = "Least Concern"
         elif NUM_CLASS[class_ind] == 'Black-headed Grosbeak':
             rectangle_colors = (0,106,188)
+            scientific_name = 'Pheucticus melanocephalus'
+            IUCN = "Least Concern"
         elif NUM_CLASS[class_ind] == 'Black-headed Grosbeak - Female':
             rectangle_colors = (50,150,220)
+            scientific_name = 'Pheucticus melanocephalus'
+            IUCN = "Least Concern"
         elif NUM_CLASS[class_ind] == 'Blue Jay':
             rectangle_colors = (160,95,35)
+            scientific_name = 'Cyanocitta cristata'
+            IUCN = "Least Concern"
         elif NUM_CLASS[class_ind] == 'Carolina Wren':
             rectangle_colors = (75,135,180)
+            scientific_name = 'Thryothorus ludovicianus'
+            IUCN = "Least Concern"
         elif NUM_CLASS[class_ind] == 'Chestnut-backed Chickadee':
             rectangle_colors = (24,70,87)
+            scientific_name = 'Poecile rufescens'
+            IUCN = "Least Concern"
         elif NUM_CLASS[class_ind] == 'Chipping Sparrow':
             rectangle_colors = (50,110,155)
+            scientific_name = 'Spizella passerina'
+            IUCN = "Least Concern"
         elif NUM_CLASS[class_ind] == 'Dark-eyed Junco':
             rectangle_colors = (57,47,45)
+            scientific_name = 'Junco hyemalis'
+            IUCN = "Least Concern"
         elif NUM_CLASS[class_ind] == 'Downy Woodpecker':
             rectangle_colors = (56,69,79)
+            scientific_name = 'Dryobates pubescens'
+            IUCN = "Least Concern"
         elif NUM_CLASS[class_ind] == 'Eastern Bluebird':
             rectangle_colors = (235,155,73)
+            scientific_name = 'Sialia sialis'
+            IUCN = "Least Concern"
         elif NUM_CLASS[class_ind] == 'Eastern Phoebe':
             rectangle_colors = (125,125,125)
+            scientific_name = 'Sayornis phoebe'
+            IUCN = "Least Concern"
         elif NUM_CLASS[class_ind] == 'Eastern Towhee':
             rectangle_colors = (15,105,200)
+            scientific_name = 'Pipilo erythrophthalmus'
+            IUCN = "Least Concern"
         elif NUM_CLASS[class_ind] == 'European Starling':
             rectangle_colors = (96,96,96)
+            scientific_name = 'Sturnus vulgaris'
+            IUCN = "Least Concern"
         elif NUM_CLASS[class_ind] == 'Golden-crowned Sparrow':
             rectangle_colors = (0,215,215)
+            scientific_name = 'Zonotrichia atricapilla'
+            IUCN = "Least Concern"
         elif NUM_CLASS[class_ind] == 'Grey Catbird':
             rectangle_colors = (175,175,175)
+            scientific_name = 'Dumetella carolinensis'
+            IUCN = "Least Concern"
         elif NUM_CLASS[class_ind] == 'House Finch - Male':
             rectangle_colors = (212,170,255)
+            scientific_name = 'Haemorhous mexicanus'
+            IUCN = "Least Concern"
         elif NUM_CLASS[class_ind] == 'House Finch - Female':
             rectangle_colors = (126,139,155)
+            scientific_name = 'Haemorhous mexicanus'
+            IUCN = "Least Concern"
         elif NUM_CLASS[class_ind] == 'House Sparrow':
             rectangle_colors = (10,66,89)
+            scientific_name = 'Passer domesticus'
+            IUCN = "Least Concern"
         elif NUM_CLASS[class_ind] == 'Indigo Bunting':
             rectangle_colors = (0,95,190)
+            scientific_name = 'Passerina cyanea'
+            IUCN = "Least Concern"
         elif NUM_CLASS[class_ind] == 'Mourning Dove':
             rectangle_colors = (205,175,85)
+            scientific_name = 'Zenaida macroura'
+            IUCN = "Least Concern"
         elif NUM_CLASS[class_ind] == 'Northern Cardinal':
             rectangle_colors = (30,30,235)
+            scientific_name = 'Cardinalis cardinalis'
+            IUCN = "Least Concern"
         elif NUM_CLASS[class_ind] == 'Northern Flicker':
             rectangle_colors = (138,144,177)
+            scientific_name = 'Colaptes auratus'
+            IUCN = "Least Concern"
         elif NUM_CLASS[class_ind] == 'Northern Mockingbird':
             rectangle_colors = (204,204,204)
+            scientific_name = 'Mimus polyglottos'
+            IUCN = "Least Concern"
         elif NUM_CLASS[class_ind] == 'Osprey':
             rectangle_colors = (66,98,117)
+            scientific_name = 'Pandion haliaetus'
+            IUCN = "Least Concern"
         elif NUM_CLASS[class_ind] == 'Osprey - Chick':
             rectangle_colors = (121,142,155)
+            scientific_name = 'Pandion haliaetus'
+            IUCN = "Least Concern"
         elif NUM_CLASS[class_ind] == 'Osprey - Egg':
             rectangle_colors = (145,176,196)
+            scientific_name = 'Pandion haliaetus'
+            IUCN = "Least Concern"
         elif NUM_CLASS[class_ind] == 'Pine Siskin':
             rectangle_colors = (137,110,97)
+            scientific_name = 'Spinus pinus'
+            IUCN = "Least Concern"
         elif NUM_CLASS[class_ind] == 'Pine Warbler':
             rectangle_colors = (0,255,255)
+            scientific_name = 'Setophaga pinus'
+            IUCN = "Least Concern"
         elif NUM_CLASS[class_ind] == 'Purple Finch':
             rectangle_colors = (117,30,220)
+            scientific_name = 'Haemorhous purpureus'
+            IUCN = "Least Concern"
         elif NUM_CLASS[class_ind] == 'Red-breasted Nuthatch':
             rectangle_colors = (58,95,196)
+            scientific_name = 'Sitta canadensis'
+            IUCN = "Least Concern"
         elif NUM_CLASS[class_ind] == 'Red-winged Blackbird':
             rectangle_colors = (25,25,25)
+            scientific_name = 'Agelaius phoeniceus'
+            IUCN = "Least Concern"
         elif NUM_CLASS[class_ind] == 'Ruby-crowned Kinglet':
             rectangle_colors = (0,128,128)
+            scientific_name = 'Regulus calendula'
+            IUCN = "Least Concern"
         elif NUM_CLASS[class_ind] == 'Ruby-throated Hummingbird':
             rectangle_colors = (8,214,8)
+            scientific_name = 'Archilochus colubris'
+            IUCN = "Least Concern"
         elif NUM_CLASS[class_ind] == 'Steller\'s Jay':
             rectangle_colors = (191,95,0)
+            scientific_name = 'Cyanocitta stelleri'
+            IUCN = "Least Concern"
         elif NUM_CLASS[class_ind] == 'Spotted Towhee':
             rectangle_colors = (47,38,29)
+            scientific_name = 'Pipilo maculatus'
+            IUCN = "Least Concern"
         elif NUM_CLASS[class_ind] == 'Song Sparrow':
             rectangle_colors = (10,255,0)
+            scientific_name = 'Melospiza melodia'
+            IUCN = "Least Concern"
         elif NUM_CLASS[class_ind] == 'Townsend\'s Warbler':
             rectangle_colors = (53,214,255)
+            scientific_name = 'Setophaga townsendi'
+            IUCN = "Least Concern"
         elif NUM_CLASS[class_ind] == 'Tufted Titmouse':
             rectangle_colors = (75,75,75)
+            scientific_name = 'Baeolophus bicolor'
+            IUCN = "Least Concern"
         elif NUM_CLASS[class_ind] == 'Turkey Vulture':
             rectangle_colors = (0,95,142)
-        elif NUM_CLASS[class_ind] == 'Bald Eagle':
-            rectangle_colors = (213,209,205)
+            scientific_name = 'Cathartes aura'
+            IUCN = "Least Concern"
         else:
             rectangle_colors = (255,255,255)
         
@@ -353,30 +446,39 @@ def draw_bbox(image, bboxes, CLASSES=YOLO_COCO_CLASSES, show_label=True, show_co
         (x1, y1), (x2, y2) = (coor[0], coor[1]), (coor[2], coor[3])
 
         # put object rectangle
-        cv2.rectangle(image, (x1, y1), (x2, y2), bbox_color, bbox_thick*2)
+        if draw_rect:
+            cv2.rectangle(image, (x1, y1), (x2, y2), bbox_color, bbox_thick*2)
 
         if show_label:
             # get text label
-            score_str = " {:.1f}%".format(score*100) if show_confidence else ""
+            score_str = " - {:.1f}%".format(score*100) if show_confidence else ""
 
             if tracking: score_str = " "+str(score)
 
             try:
                 label = "{}".format(NUM_CLASS[class_ind]) + score_str
+                LABEL.append(label)
+                label_sci = scientific_name + " - " + IUCN
             except KeyError:
                 print("You received KeyError, this might be that you are trying to use yolo original weights")
-                print("while using custom classes, if using custom model in configs.py set YOLO_CUSTOM_WEIGHTS = True")
+                print("while using custom classes, if using custom model in http://configs.py set YOLO_CUSTOM_WEIGHTS = True")
 
             # get text size
             (text_width, text_height), baseline = cv2.getTextSize(label, cv2.FONT_HERSHEY_COMPLEX_SMALL,
                                                                   fontScale, thickness=bbox_thick)
+            (text_width_sci, text_height_sci), baseline_sci = cv2.getTextSize(label_sci, cv2.FONT_HERSHEY_COMPLEX_SMALL,
+                                                                  fontScale, thickness=bbox_thick)
             # put filled text rectangle
-            cv2.rectangle(image, (x1, y1), (x1 + text_width, y1 - text_height - baseline), bbox_color, thickness=cv2.FILLED)
-            
+            cv2.rectangle(image, (x1, y1-text_height-24), (x1 + text_width, y1 - text_height - baseline), bbox_color, thickness=cv2.FILLED)
+            cv2.rectangle(image, (x1, y1), (x1 + text_width_sci, y1 - text_height_sci - baseline_sci), bbox_color, thickness=cv2.FILLED)
+           
             Text_colors=(blue[i], green[i], red[i])
             
             # put text above rectangle
-            cv2.putText(image, label, (x1, y1-4), cv2.FONT_HERSHEY_COMPLEX_SMALL,
+            cv2.putText(image, label, (x1, y1-text_height-10), cv2.FONT_HERSHEY_COMPLEX_SMALL,
+                        fontScale, Text_colors, bbox_thick, lineType=cv2.LINE_AA)
+
+            cv2.putText(image, label_sci, (x1, y1-4), cv2.FONT_HERSHEY_COMPLEX_SMALL,
                         fontScale, Text_colors, bbox_thick, lineType=cv2.LINE_AA)
 
     return image
@@ -482,7 +584,10 @@ def postprocess_boxes(pred_bbox, original_image, input_size, score_threshold):
     return np.concatenate([coors, scores[:, np.newaxis], classes[:, np.newaxis]], axis=-1)
 
 
-def detect_image(Yolo, image_path, output_path, input_size=416, show=False, CLASSES=YOLO_COCO_CLASSES, score_threshold=0.3, iou_threshold=0.45, rectangle_colors=''):
+def detect_image(Yolo, image_path, input_size=416, show=False, CLASSES=YOLO_COCO_CLASSES, score_threshold=0.5, iou_threshold=0.45, rectangle_colors=''):
+    
+    write_label = ''
+
     original_image      = cv2.imread(image_path)
     original_image      = cv2.cvtColor(original_image, cv2.COLOR_BGR2RGB)
     original_image      = cv2.cvtColor(original_image, cv2.COLOR_BGR2RGB)
@@ -506,19 +611,28 @@ def detect_image(Yolo, image_path, output_path, input_size=416, show=False, CLAS
     bboxes = postprocess_boxes(pred_bbox, original_image, input_size, score_threshold)
     bboxes = nms(bboxes, iou_threshold, method='nms')
 
-    image = draw_bbox(original_image, bboxes, CLASSES=CLASSES, rectangle_colors=rectangle_colors)
-    # CreateXMLfile("XML_Detections", str(int(time.time())), original_image, bboxes, read_class_names(CLASSES))
+    image = draw_bbox(original_image, bboxes, CLASSES=CLASSES, draw_rect=True, rectangle_colors=rectangle_colors)
 
-    if output_path != '': cv2.imwrite(output_path, image)
-    if show:
-        # Show the image
-        cv2.imshow("predicted image", image)
-        # Load and hold the image
-        cv2.waitKey(0)
-        # To close the window after the required kill value was provided
-        cv2.destroyAllWindows()
+    cv2.imwrite("temp.jpg", image)
+
+    counter = 1
+
+    for x in LABEL:
+        if len(LABEL) > counter:
+            write_label += x+", "
+            print("counter " + str(counter))
+            print("length " + str(len(LABEL)))
+            counter += 1
+        else:
+            write_label += x
+
+
+    with open('label.txt', 'w') as label_file:
+        label_file.write(write_label)
+    print(write_label)
+    # CreateXMLfile("XML_Detections", str(int(time.time())), original_image, bboxes, read_class_names(CLASSES))
         
-    return image
+    return LABEL
 
 def Predict_bbox_mp(Frames_data, Predicted_data, Processing_times):
     gpus = tf.config.experimental.list_physical_devices('GPU')
@@ -830,8 +944,8 @@ def detect_video(Yolo, video_path, output_path, input_size=YOLO_INPUT_SIZE, show
         times.append(t2-t1)
         times_2.append(t3-t1)
         
-        times = times[-60:]
-        times_2 = times_2[-60:]
+        times = times[-300:]
+        times_2 = times_2[-300:]
 
         ms = sum(times)/len(times)*1000
         fps = 1000 / ms
@@ -1180,30 +1294,39 @@ def detect_realtime(Yolo, output_path, camera_id, input_size=YOLO_INPUT_SIZE, sh
     cv2.destroyAllWindows()
     
 # detect from IP camera
-def detect_ip_camera(Yolo, output_path, input_size=YOLO_INPUT_SIZE, show=True, CLASSES=YOLO_COCO_CLASSES, score_threshold=0.6, iou_threshold=0.4, rectangle_colors=''):
+def detect_ip_camera(Yolo, output_path, input_size=YOLO_INPUT_SIZE, show=True, CLASSES=YOLO_COCO_CLASSES, score_threshold=0.6, iou_threshold=0.35, rectangle_colors='', ALGORAND_WALLET='', IP_CAMERA_NAME=''):
     
     times, times_2 = [], []
     now = datetime.now()
     current_time = now.strftime("%m-%d-%M")
     
-    cap_audio = subprocess.Popen('vlc --novideo -Idummy rtsp://ubnt:ubnt@162.251.9.138:554/s0')
-    
-    time.sleep(1)
-    
-    rtsp_stream_link = 'rtsp://ubnt:ubnt@162.251.9.138:554/s0'
-    video_stream_widget = RTSPVideoWriterObject(rtsp_stream_link)
+    video_stream_widget = RTSPVideoWriterObject(IP_CAMERA_NAME)
     
     frameCount = 0
+    totalDailySightingFormula = "=COUNTIF($A$2:$A$500000,INDIRECT(ADDRESS(ROW(),1)))"
+    totalSightingsFormula = "=COUNTA($D$2:$D$500000)"
+    totalUnsuccessfulFormula = "=COUNTIF($D$2:$D$500000,\"[]\")"
+    rateOfSuccess = "=(INDIRECT(ADDRESS(ROW(),8))-INDIRECT(ADDRESS(ROW(),9)))/INDIRECT(ADDRESS(ROW(),8))"
     videoRecordIncrementor = 0
-    min_frames_thresh = 60
-    frameThreshold = 90
+    g = geocoder.ip('me')
+    geolocator = Nominatim(user_agent="http")
+    cords = str(g.lat) + "," + str(g.lng)
+    loc = geolocator.reverse(cords)
+    city = loc.raw.get('address').get('city')
+    min_frames_thresh = 10
+    frameThreshold = 15
     species_frame_count = 0
+    birdsEarned = 0
     seen_species_array = []
     wrapped_seen_species = ''
     approval_species_array = []
     temp_species_array = []
+    last_temp_species_array = "Last seen: []"
+    last_array_x = 160
+    last_time_seen = ""
     currentScore = []
     timer_species_array = []
+    first_guess = True
     
     t = time.localtime()
     
@@ -1230,8 +1353,8 @@ def detect_ip_camera(Yolo, output_path, input_size=YOLO_INPUT_SIZE, show=True, C
         time.sleep(.00001)   # simulate time between events
     
         try:
-            video_stream_widget.show_frame()
-            video_stream_widget.save_frame()
+            video_stream_widget.show_frame(Yolo, score_threshold, iou_threshold, CLASSES, rectangle_colors)
+            # video_stream_widget.save_frame()
         except AttributeError:
             pass
     
@@ -1249,24 +1372,22 @@ def detect_ip_camera(Yolo, output_path, input_size=YOLO_INPUT_SIZE, show=True, C
         
         print("Time: {:.2f}ms, Detection FPS: {:.1f}, total FPS: {:.1f}".format(ms, fps, fps2))        
         
-        print(output_path)
-        
-        if cv2.waitKey(1) & 0xFF == ord("q"):
-            cv2.destroyAllWindows()
-            cap_audio.terminate()
-            break
+        # print(output_path)
                 
         if frameCount % frameThreshold == 0:
             approval_species_array = []
             species_frame_count = 0
-
+    
+    cap_audio.terminate()
     cv2.destroyAllWindows()
     
 # bufferless VideoCapture
 class RTSPVideoWriterObject(object):
     def __init__(self, src=0):
         # Create a VideoCapture object
-        self.capture = cv2.VideoCapture("rtsp://ubnt:ubnt@162.251.9.138:554/s0")
+        self.capture = cv2.VideoCapture(IP_CAMERA_NAME)
+        self.cap_audio = subprocess.Popen('vlc --novideo -Idummy '+str(IP_CAMERA_NAME))
+        time.sleep(2.6)
 
         # Default resolutions of the frame are obtained (system dependent)
         self.frame_width = int(self.capture.get(3))
@@ -1274,7 +1395,7 @@ class RTSPVideoWriterObject(object):
 
         # Set up codec and output video settings
         self.codec = cv2.VideoWriter_fourcc('M','J','P','G')
-        self.output_video = cv2.VideoWriter('output.avi', self.codec, 30, (self.frame_width, self.frame_height))
+        # self.output_video = cv2.VideoWriter('output.avi', self.codec, 30, (self.frame_width, self.frame_height))
 
         # Start the thread to read frames from the video stream
         self.thread = Thread(target=self.update, args=())
@@ -1287,16 +1408,40 @@ class RTSPVideoWriterObject(object):
             if self.capture.isOpened():
                 (self.status, self.frame) = self.capture.read()
 
-    def show_frame(self):
+    def show_frame(self, Yolo, score_threshold, iou_threshold, CLASSES, rectangle_colors):
         # Display frames in main program
         if self.status:
-            cv2.imshow('frame', self.frame)
+            
+            image_data = image_preprocess(np.copy(self.frame), [YOLO_INPUT_SIZE, YOLO_INPUT_SIZE])
+            image_data = image_data[np.newaxis, ...].astype(np.float32)
+            
+            if YOLO_FRAMEWORK == "tf":
+                pred_bbox = Yolo.predict(image_data)
+            elif YOLO_FRAMEWORK == "trt":
+                batched_input = tf.constant(image_data)
+                result = Yolo(batched_input)
+                pred_bbox = []
+                for key, value in result.items():
+                    value = value.numpy()
+                    pred_bbox.append(value)
+            
+            t2 = time.time()
+            
+            pred_bbox = [tf.reshape(x, (-1, tf.shape(x)[-1])) for x in pred_bbox]
+            pred_bbox = tf.concat(pred_bbox, axis=0)
+
+            bboxes = postprocess_boxes(pred_bbox, self.frame, YOLO_INPUT_SIZE, score_threshold)
+            bboxes = nms(bboxes, iou_threshold, method='nms')        
+            
+            image = draw_bbox(self.frame, bboxes, CLASSES=CLASSES, rectangle_colors=rectangle_colors)
+            cv2.imshow('frame', image)
 
         # Press Q on keyboard to stop recording
         key = cv2.waitKey(1)
         if key == ord('q'):
             self.capture.release()
-            self.output_video.release()
+            self.cap_audio.terminate()
+            # self.output_video.release()
             cv2.destroyAllWindows()
             exit(1)
 

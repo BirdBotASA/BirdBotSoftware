@@ -37,20 +37,28 @@ cwd = os.getcwd()
 def processVideo():
     video_path = filedialog.askopenfilename(initialdir = "./YOLO_Videos/", title = "Select a Video File",filetypes = (("all video format","*.mp4*"),("all files","*.*")))
     detect_video(yolo, video_path, video_path[:-4] + '-ML.mp4', input_size=YOLO_INPUT_SIZE, show=True, CLASSES=TRAIN_CLASSES, rectangle_colors=(255,0,0), HatMode=HAT_MODE)
-	
+    
 def RealTimeMode():
     Wallet_Input = ALGORAND_WALLET_LABEL.get("1.0", "end-1c")
     Camera_Input = BIRDBOT_CAMERA_LABEL.get("1.0", "end-1c")
-    Camera_ID_Input = current_value.get()
-    print(Camera_ID_Input)
-    Wallet = open(cwd + "\yolov3\wallet.py", "w")
+    IP_Input = IP_CAMERA_LABEL.get("1.0", "end-1c")
+    Wallet = open("B:\BirdBot\BirdKeras\TensorFlow2\yolov3\wallet.py", "w")
     Wallet.write("BIRDBOT_CAMERA_NAME         = " + "\'" + Camera_Input + "\'" + "\n")
-    Wallet.write("ALGORAND_WALLET             = " + "\'" + Wallet_Input + "\'")
+    Wallet.write("ALGORAND_WALLET             = " + "\'" + Wallet_Input + "\'"+ "\n")
+    Wallet.write("IP_CAMERA_NAME             = " + "\'" + IP_Input + "\'")
     Wallet.close()
-    detect_realtime(yolo, './YOLO_Videos/', camera_id=Camera_ID_Input, input_size=YOLO_INPUT_SIZE, show=True, CLASSES=TRAIN_CLASSES, rectangle_colors=(255, 0, 0), ALGORAND_WALLET=Wallet_Input)
-	
+    detect_realtime(yolo, './YOLO_Videos/', input_size=YOLO_INPUT_SIZE, show=True, CLASSES=TRAIN_CLASSES, rectangle_colors=(255, 0, 0), ALGORAND_WALLET=Wallet_Input)
+    
 def IPCameraMode():
-    detect_ip_camera(yolo, './YOLO_Videos/', input_size=YOLO_INPUT_SIZE, show=True, CLASSES=TRAIN_CLASSES, rectangle_colors=(255, 0, 0))
+    Wallet_Input = ALGORAND_WALLET_LABEL.get("1.0", "end-1c")
+    Camera_Input = BIRDBOT_CAMERA_LABEL.get("1.0", "end-1c")
+    IP_Input = IP_CAMERA_LABEL.get("1.0", "end-1c")
+    Wallet = open("B:\BirdBot\BirdKeras\TensorFlow2\yolov3\wallet.py", "w")
+    Wallet.write("BIRDBOT_CAMERA_NAME         = " + "\'" + Camera_Input + "\'" + "\n")
+    Wallet.write("ALGORAND_WALLET             = " + "\'" + Wallet_Input + "\'"+ "\n")
+    Wallet.write("IP_CAMERA_NAME             = " + "\'" + IP_Input + "\'")
+    Wallet.close()
+    detect_ip_camera(yolo, './YOLO_Videos/', input_size=YOLO_INPUT_SIZE, show=True, CLASSES=TRAIN_CLASSES, rectangle_colors=(255, 0, 0), ALGORAND_WALLET=Wallet_Input, IP_CAMERA_NAME=IP_Input)
     
 def callback(indata, outdata, frames, time, status):
     if status:
@@ -99,6 +107,13 @@ Camera_ID_SpinBox = Spinbox(window, from_ = 0, to = 4, textvariable=current_valu
 camera_id_label = Label(window, text = "Camera ID - For switching cameras")
 camera_id_label.config(font =("Courier", 10))
 
+IP_CAMERA_LABEL = Text(window, height = 1, width = 60)
+IP_CAMERA_LABEL.insert(1.0, IP_CAMERA_NAME)
+
+# Create IP Camera label
+ip_label = Label(window, text = "RTSP URL - Optional")
+ip_label.config(font =("Courier", 10))
+
 button_process_video = Button(window,
                         text = "Process Video",
                         command = processVideo)
@@ -129,17 +144,21 @@ camera_label.grid(row = 3, column = 0, columnspan = 2, pady = 5)
 
 BIRDBOT_CAMERA_LABEL.grid(row = 4, column = 0, columnspan = 2, pady = 5)
 
-camera_id_label.grid(row = 5, column = 0, columnspan = 2, pady = 5)
+ip_label.grid(row = 5, column = 0, columnspan = 2, pady = 5)
 
-Camera_ID_SpinBox.grid(row = 6, column = 0, columnspan = 2, pady = 5)
+IP_CAMERA_LABEL.grid(row = 6, column = 0, columnspan = 2, pady = 10)
 
-button_process_video.grid(row = 7, column = 0, columnspan = 2, pady = 5)
+camera_id_label.grid(row = 7, column = 0, columnspan = 2, pady = 5)
 
-button_realtime_mode.grid(row = 8, column = 0, columnspan = 2, pady = 5)
+Camera_ID_SpinBox.grid(row = 8, column = 0, columnspan = 2, pady = 5)
 
-button_ip_camera_mode.grid(row = 9, column = 0, columnspan = 2, pady = 5)
+button_process_video.grid(row = 9, column = 0, columnspan = 2, pady = 5)
 
-button_exit.grid(row = 10, column = 0, columnspan = 2, pady = 5)
+button_realtime_mode.grid(row = 10, column = 0, columnspan = 2, pady = 5)
+
+button_ip_camera_mode.grid(row = 11, column = 0, columnspan = 2, pady = 5)
+
+button_exit.grid(row = 12, column = 0, columnspan = 2, pady = 5)
 
 os.system('cls')
 

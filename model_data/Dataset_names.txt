@@ -1,13 +1,15 @@
 American Crow
+Northern Mockingbird
 American Goldfinch
+House Sparrow
 Golden-crowned Sparrow
 Pine Siskin
-Steller's Jay
-Black-capped Chickadee
-House Sparrow
 House Finch - Female
+Black-capped Chickadee
+Steller's Jay
 American Robin
 Bald Eagle
+Barn Swallow
 Red-breasted Nuthatch
 Dark-eyed Junco
 Northern Flicker
@@ -22,19 +24,25 @@ Black Vulture
 Turkey Vulture
 Blue Jay
 Carolina Wren
+Cedar Waxwing
 Ruby-crowned Kinglet
 Chipping Sparrow
+Common Yellowthroat
 Purple Finch
+Downy Woodpecker
 Eastern Bluebird
 Eastern Phoebe
 Eastern Towhee
+Grey Catbird
+House Wren
 Indigo Bunting
 Mourning Dove
 Northern Cardinal
-Northern Mockingbird
 Osprey
 Osprey - Chick
 Osprey - Egg
 Pine Warbler
+Red-winged Blackbird
 Ruby-throated Hummingbird
+Spotted Towhee
 Tufted Titmouse

@@ -30,7 +30,7 @@ YOLO_STRIDES                = [8, 16, 32]
 YOLO_IOU_LOSS_THRESH        = 0.6
 YOLO_ANCHOR_PER_SCALE       = 3
 YOLO_MAX_BBOX_PER_SCALE     = 100
-YOLO_INPUT_SIZE             = 512
+YOLO_INPUT_SIZE             = 416
 if YOLO_TYPE                == "yolov4":
     YOLO_ANCHORS            = [[[12,  16], [19,   36], [40,   28]],
                                [[36,  75], [76,   55], [72,  146]],
@@ -50,7 +50,7 @@ TRAIN_CHECKPOINTS_FOLDER    = "checkpoints"
 TRAIN_MODEL_NAME            = f"{YOLO_TYPE}_custom"
 TRAIN_LOAD_IMAGES_TO_RAM    = False # With True faster training, but need more RAM
 TRAIN_BATCH_SIZE            = 8
-TRAIN_INPUT_SIZE            = 512
+TRAIN_INPUT_SIZE            = 416
 TRAIN_DATA_AUG              = True
 TRAIN_TRANSFER              = True
 TRAIN_FROM_CHECKPOINT       = True # "checkpoints/yolov3_custom"
@@ -80,7 +80,7 @@ MODT = False
 # TEST options
 TEST_BATCH_SIZE             = 8
 TEST_ANNOT_PATH             = "model_data/Dataset_test.txt"
-TEST_INPUT_SIZE             = 512
+TEST_INPUT_SIZE             = 416
 TEST_DATA_AUG               = False
 TEST_DECTECTED_IMAGE_PATH   = ""
 TEST_SCORE_THRESHOLD        = 0.4
