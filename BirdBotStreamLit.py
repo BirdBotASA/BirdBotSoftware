@@ -107,9 +107,6 @@ st.map(filtered_data)
 
 st.markdown("""---""")
 
-if st.button('Start Real-Time Mode'):
-    start_realtime()
-
 if st.checkbox('Show raw data'):
     st.subheader('Raw data')
     st.write(data)
