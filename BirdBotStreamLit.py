@@ -31,6 +31,31 @@ def start_realtime():
     Wallet.close()
     detect_realtime(yolo, './YOLO_Videos/', camera_id=Camera_Number,  input_size=YOLO_INPUT_SIZE, show=True, CLASSES=TRAIN_CLASSES, rectangle_colors=(255, 0, 0), ALGORAND_WALLET=Wallet_Input)
 
+def start_predict():
+    
+    uploadColumn, predictColumn = st.columns(2)
+
+    with uploadColumn:
+        st.subheader('Uploaded Image')
+        upload = Image.open(file)
+        with open(file.name,"wb") as f:
+            f.write(file.getbuffer())
+        st.image(upload)
+
+    detect_image(yolo, file.name, input_size=YOLO_INPUT_SIZE, show=True, CLASSES=TRAIN_CLASSES, rectangle_colors=(255,0,0))
+
+    with predictColumn:
+        st.subheader('BirdBot Image')
+        st.image("temp.jpg")
+        time.sleep(1)
+        os.remove(file.name)
+
+    with open('label.txt') as f:
+        contents = f.read()
+    st.subheader('BirdBot Prediction:')
+    st.text(contents)
+    st.markdown("""---""")
+
 @st.cache
 def load_data(nrows):
     data = pd.read_csv(DATA_URL, nrows=nrows)
@@ -62,30 +87,7 @@ st.markdown("""---""")
 
 if file:  # if user uploaded file
         
-        load_yolo()
-
-        uploadColumn, predictColumn = st.columns(2)
-
-        with uploadColumn:
-            st.subheader('Uploaded Image')
-            upload = Image.open(file)
-            with open(file.name,"wb") as f:
-                f.write(file.getbuffer())
-            st.image(upload)
-
-        detect_image(yolo, file.name, input_size=YOLO_INPUT_SIZE, show=True, CLASSES=TRAIN_CLASSES, rectangle_colors=(255,0,0))
-
-        with predictColumn:
-            st.subheader('BirdBot Image')
-            st.image("temp.jpg")
-            time.sleep(1)
-            os.remove(file.name)
-
-        with open('label.txt') as f:
-            contents = f.read()
-        st.subheader('BirdBot Prediction:')
-        st.text(contents)
-        st.markdown("""---""")
+        start_predict()
 
 st.subheader('Number of Wildlife Sightings by Hour - Global Data')
 
@@ -104,6 +106,9 @@ st.subheader(f'Map of all Wildlife Sightings at {hour_to_filter}:00')
 st.map(filtered_data)
 
 st.markdown("""---""")
+
+if st.button('Start Real-Time Mode'):
+    start_realtime()
 
 if st.checkbox('Show raw data'):
     st.subheader('Raw data')
