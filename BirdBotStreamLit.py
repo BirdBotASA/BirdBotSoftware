@@ -9,7 +9,12 @@ from yolov3.wallet import *
 from PIL import Image
 import os
 
-st.title('BirdBot - Machine Learning dApp')
+st.set_page_config(
+page_title="BirdBot - Machine Learning dApp",
+page_icon="BirdBotIcon.png",
+initial_sidebar_state="auto")
+
+st.title("BirdBot - Machine Learning dApp")
 
 DATE_COLUMN = 'date/time'
 SPECIES_COLUMN = 'Bird_Species_Triggered'
