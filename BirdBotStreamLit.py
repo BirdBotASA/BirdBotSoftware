@@ -32,7 +32,7 @@ def start_realtime():
     detect_realtime(yolo, './YOLO_Videos/', camera_id=Camera_Number,  input_size=YOLO_INPUT_SIZE, show=True, CLASSES=TRAIN_CLASSES, rectangle_colors=(255, 0, 0), ALGORAND_WALLET=Wallet_Input)
 
 def start_predict():
-    
+    yolo = Load_Yolo_model()
     uploadColumn, predictColumn = st.columns(2)
 
     with uploadColumn:
