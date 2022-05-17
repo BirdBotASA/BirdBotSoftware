@@ -19,6 +19,7 @@ st.title("BirdBot - Machine Learning dApp")
 DATE_COLUMN = 'date/time'
 SPECIES_COLUMN = 'Bird_Species_Triggered'
 DATA_URL = ('BirdBotStreamLitData.csv')
+SPECIES_LIST_URL = ('BirdBotStreamLitSpecies.csv')
 image = ''
 LABEL = ''
 
@@ -83,6 +84,11 @@ with st.sidebar:
 
 file = st.file_uploader('Upload An Image', type=['jpg', 'jpeg'])
 
+with st.expander("See supported species"):
+    species_data = pd.read_csv(SPECIES_LIST_URL)
+
+    st.table(species_data)
+
 st.markdown("""---""")
 
 if file:  # if user uploaded file
@@ -106,6 +112,9 @@ st.subheader(f'Map of all Wildlife Sightings at {hour_to_filter}:00')
 st.map(filtered_data)
 
 st.markdown("""---""")
+
+if st.button('Start Real-Time Mode'):
+    start_realtime()
 
 if st.checkbox('Show raw data'):
     st.subheader('Raw data')
