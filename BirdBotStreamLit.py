@@ -39,7 +39,7 @@ data_load_state.text("Done!")
 time.sleep(1)
 data_load_state.text("")
 
-file = st.file_uploader('Upload An Image', type=['jpg'])
+file = st.file_uploader('Upload An Image', type=['jpg', 'jpeg'])
 
 st.markdown("""---""")
 
