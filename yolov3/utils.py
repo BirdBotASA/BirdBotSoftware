@@ -1040,7 +1040,7 @@ def detect_realtime(Yolo, output_path, camera_id, input_size=YOLO_INPUT_SIZE, sh
     
     _, img2 = vid.read()
     
-    # img2 = cv2.resize(img2, (width, height))
+    img2 = cv2.resize(img2, (width, height))
     
     blk = np.zeros(img2.shape, np.uint8)
     
@@ -1053,7 +1053,7 @@ def detect_realtime(Yolo, output_path, camera_id, input_size=YOLO_INPUT_SIZE, sh
     while True:
         _, image = vid.read()
         
-        # image = cv2.resize(image, (width, height))
+        image = cv2.resize(image, (width, height))
         
         guess_copy = image
         currentSpecies = ''
