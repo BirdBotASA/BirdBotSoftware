@@ -1,13 +1,3 @@
-#================================================================
-#
-#   File name   : utils.py
-#   Author      : PyLessons
-#   Created date: 2020-09-27
-#   Website     : https://pylessons.com/
-#   GitHub      : https://github.com/pythonlessons/TensorFlow-2.x-YOLOv3
-#   Description : additional yolov3 and yolov4 functions
-#
-#================================================================
 from multiprocessing import Process, Queue, Pipe
 import cv2
 import os
@@ -925,6 +915,8 @@ def detect_video(Yolo, video_path, output_path, input_size=YOLO_INPUT_SIZE, show
         
         # Create opacity overlay        
         image = cv2.addWeighted(image, 1.0, blk, 0.40, 1)
+
+        birdCount = len(bboxes)
         
         for i, line in enumerate(wrapped_seen_species):
                         
@@ -1277,7 +1269,9 @@ def detect_realtime(Yolo, output_path, camera_id, input_size=YOLO_INPUT_SIZE, sh
             first_guess = False
 
         if show:
-            cv2.imshow('output', image)
+            window_name = 'BirdBot - Real-Time'
+            cv2.imshow(window_name, image)
+            cv2.setWindowProperty(window_name, cv2.WND_PROP_TOPMOST, 1)
             if cv2.waitKey(1) & 0xFF == ord("q"):
                 cv2.destroyAllWindows()
                 break

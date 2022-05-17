@@ -22,6 +22,15 @@ DATA_URL = ('BirdBotStreamLitData.csv')
 image = ''
 LABEL = ''
 
+def start_realtime():
+    yolo = Load_Yolo_model()
+    Wallet = open("B:\BirdBot\BirdKeras\TensorFlow2\yolov3\wallet.py", "w")
+    Wallet.write("BIRDBOT_CAMERA_NAME         = " + "\'" + Camera_Input + "\'" + "\n")
+    Wallet.write("ALGORAND_WALLET             = " + "\'" + Wallet_Input + "\'"+ "\n")
+    Wallet.write("IP_CAMERA_NAME             = " + "\'" + IP_Input + "\'")
+    Wallet.close()
+    detect_realtime(yolo, './YOLO_Videos/', camera_id=Camera_Number,  input_size=YOLO_INPUT_SIZE, show=True, CLASSES=TRAIN_CLASSES, rectangle_colors=(255, 0, 0), ALGORAND_WALLET=Wallet_Input)
+
 @st.cache
 def load_data(nrows):
     data = pd.read_csv(DATA_URL, nrows=nrows)
@@ -30,26 +39,34 @@ def load_data(nrows):
     data[DATE_COLUMN] = pd.to_datetime(data[DATE_COLUMN])
     return data
     
-# Create a text element and let the reader know the data is loading.
-data_load_state = st.text('Loading data...')
 # Load 10,000 rows of data into the dataframe.
 data = load_data(10000)
-# Notify the reader that the data was successfully loaded.
-data_load_state.text("Done!")
-time.sleep(1)
-data_load_state.text("")
+
+st.sidebar.title("BirdBot Settings Panel")
+st.sidebar.header("Camera Settings")
+
+with st.sidebar:
+    Wallet_Input = st.text_input('Algorand Wallet', ALGORAND_WALLET)
+    Camera_Input = st.text_input('Camera Name', BIRDBOT_CAMERA_NAME)
+    IP_Input = st.text_input('IP Camera URL', IP_CAMERA_NAME)
+    Camera_Number = st.number_input('Camera Number', step=1)
+    st.markdown("""---""")
+    st.write('Algorand Wallet:', Wallet_Input)
+    st.write('Camera Name:', Camera_Input)
+    st.write('IP URL:', IP_Input)
+    st.write('Camera Number:', Camera_Number)
 
 file = st.file_uploader('Upload An Image', type=['jpg', 'jpeg'])
 
 st.markdown("""---""")
 
 if file:  # if user uploaded file
+        
+        load_yolo()
 
-        col1, col2 = st.columns(2)
+        uploadColumn, predictColumn = st.columns(2)
 
-        yolo = Load_Yolo_model()
-
-        with col1:
+        with uploadColumn:
             st.subheader('Uploaded Image')
             upload = Image.open(file)
             with open(file.name,"wb") as f:
@@ -58,7 +75,7 @@ if file:  # if user uploaded file
 
         detect_image(yolo, file.name, input_size=YOLO_INPUT_SIZE, show=True, CLASSES=TRAIN_CLASSES, rectangle_colors=(255,0,0))
 
-        with col2:
+        with predictColumn:
             st.subheader('BirdBot Image')
             st.image("temp.jpg")
             time.sleep(1)
@@ -87,6 +104,9 @@ st.subheader(f'Map of all Wildlife Sightings at {hour_to_filter}:00')
 st.map(filtered_data)
 
 st.markdown("""---""")
+
+if st.button('Start Real-Time Mode'):
+    start_realtime()
 
 if st.checkbox('Show raw data'):
     st.subheader('Raw data')

@@ -42,12 +42,13 @@ def RealTimeMode():
     Wallet_Input = ALGORAND_WALLET_LABEL.get("1.0", "end-1c")
     Camera_Input = BIRDBOT_CAMERA_LABEL.get("1.0", "end-1c")
     IP_Input = IP_CAMERA_LABEL.get("1.0", "end-1c")
+    Camera_Value = Camera_ID_SpinBox.get()
     Wallet = open("B:\BirdBot\BirdKeras\TensorFlow2\yolov3\wallet.py", "w")
     Wallet.write("BIRDBOT_CAMERA_NAME         = " + "\'" + Camera_Input + "\'" + "\n")
     Wallet.write("ALGORAND_WALLET             = " + "\'" + Wallet_Input + "\'"+ "\n")
     Wallet.write("IP_CAMERA_NAME             = " + "\'" + IP_Input + "\'")
     Wallet.close()
-    detect_realtime(yolo, './YOLO_Videos/', input_size=YOLO_INPUT_SIZE, show=True, CLASSES=TRAIN_CLASSES, rectangle_colors=(255, 0, 0), ALGORAND_WALLET=Wallet_Input)
+    detect_realtime(yolo, './YOLO_Videos/', camera_id=Camera_Value, input_size=YOLO_INPUT_SIZE, show=True, CLASSES=TRAIN_CLASSES, rectangle_colors=(255, 0, 0), ALGORAND_WALLET=Wallet_Input)
     
 def IPCameraMode():
     Wallet_Input = ALGORAND_WALLET_LABEL.get("1.0", "end-1c")
