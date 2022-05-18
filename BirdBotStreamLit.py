@@ -19,8 +19,11 @@ st.title("BirdBot - Machine Learning dApp")
 
 DATE_COLUMN = 'date/time'
 SPECIES_COLUMN = 'Bird_Species_Triggered'
-DATA_URL = ('BirdBotStreamLitData.csv')
-SPECIES_LIST_URL = ('BirdBotStreamLitSpecies.csv')
+DATA_URL = ('BirdBotStreamlitData.csv')
+SPECIES_LIST_URL = ('BirdBotStreamlitSpecies.csv')
+METRICS_URL = ('BirdBotStreamlitMetrics.csv')
+SIGHTINGS_URL = ('BirdBotStreamlitSightings.csv')
+
 CLASSES=TRAIN_CLASSES
 input_size=YOLO_INPUT_SIZE
 score_threshold=0.5
@@ -73,6 +76,8 @@ def load_data(nrows):
     
 # Load 10,000 rows of data into the dataframe.
 data = load_data(10000)
+sightings_data = pd.read_csv(SIGHTINGS_URL)
+metrics_data = pd.read_csv(METRICS_URL)
 
 st.sidebar.title("BirdBot Settings Panel")
 st.sidebar.header("Camera Settings")
@@ -120,7 +125,7 @@ if file:  # if user uploaded file
     # bboxes = postprocess_boxes(pred_bbox, frame, input_size, score_threshold)
     # bboxes = nms(bboxes, iou_threshold, method='nms')        
         
-    # frame = draw_bbox(frame, bboxes, CLASSES=CLASSES, rectangle_colors=rectangle_colors)
+    # frame = draw_bbox(frame, bboxes, CLASSES=CLASSES, draw_rect=True, rectangle_colors=rectangle_colors)
 	
     # FRAME_WINDOW.image(frame)
 
@@ -135,7 +140,29 @@ with st.expander("See supported species"):
 
 st.markdown("""---""")
 
-st.subheader('Number of Wildlife Sightings by Hour - Global Data')
+st.subheader('BirdBot Metrics')
+
+print(metrics_data)
+
+TotalWallets, TotalTransactions, TotalBirdsRewarded = st.columns(3)
+
+TotalWallets.metric("Wallets Connected", metrics_data['CountWallets'])
+TotalTransactions.metric("Software Transactions Sent", metrics_data['CountTimesSentRewards'])
+TotalBirdsRewarded.metric("Total BIRDS Awarded", metrics_data['SumTotalSentRewards'])
+
+st.markdown("""---""")
+
+TotalSightings, AverageSightings, MostSeenToday = st.columns(3)
+
+MostSeenSpecies = str(metrics_data['MostSeenSpecies'])
+
+TotalSightings.metric("Bird Sightings", metrics_data['CountTotalRows'])
+AverageSightings.metric("Average Daily Bird Sightings", metrics_data['AverageSightings'])
+MostSeenToday.metric("Today's Most Seen Species", MostSeenSpecies[3:])
+
+st.markdown("""---""")
+
+st.subheader('Wildlife Sightings by Hour - Global Data')
 
 hist_values = np.histogram(
     data[DATE_COLUMN].dt.hour, bins=24, range=(0,24))[0]
