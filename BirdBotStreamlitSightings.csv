@@ -1,2 +1,31 @@
-﻿Update,CurrentDate,CountDailyRows,CountTotalRows,CountTotalDays,CountWallets,CountTimesSentRewards,SumTotalSentRewards,CountMostSeenSpecies,CountTotalPreorders
-2022-05-18T02:50:03.9421807Z,5/18/2022,150,11223,29,10,183,45810,Chestnut-backed Chickadee,1366
+﻿BirdSpecies,Sightings
+Chestnut-backed Chickadee,2207
+Black Vulture,31
+Northern Flicker,330
+Red-breasted Nuthatch,550
+Townsend's Warbler,134
+Black-capped Chickadee,1235
+Steller's Jay,751
+Dark-eyed Junco,1173
+Golden-crowned Sparrow,328
+House Sparrow,233
+European Starling,185
+Ruby-crowned Kinglet,146
+House Finch - Female,659
+House Finch - Male,1497
+Purple Finch,2
+Pine Siskin,1207
+American Goldfinch,12
+American Crow,37
+Blue Jay,13
+Black-headed Grosbeak,13
+Northern Cardinal,347
+Black-crested Titmouse,5
+Mourning Dove,1
+Tufted Titmouse,1
+Bald Eagle,45
+American Robin,28
+Black-headed Grosbeak - Female,3
+Carolina Wren,6
+Pine Warbler,43
+Eastern Towhee,1

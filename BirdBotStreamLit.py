@@ -94,7 +94,7 @@ with st.sidebar:
     st.write('IP URL:', IP_Input)
     st.write('Camera Number:', Camera_Number)
 
-st.subheader("Detection Demos")
+st.header("Detection Demos")
 
 file = st.file_uploader('Upload An Image', type=['jpg', 'jpeg'])
 
@@ -140,9 +140,9 @@ with st.expander("See supported species"):
 
 st.markdown("""---""")
 
-st.subheader('BirdBot Metrics')
+st.header('BirdBot Metrics')
 
-print(metrics_data)
+st.subheader('Blockchain and Sightings Statistics')
 
 TotalWallets, TotalTransactions, TotalBirdsRewarded = st.columns(3)
 
@@ -167,7 +167,25 @@ st.subheader('Wildlife Sightings by Hour - Global Data')
 hist_values = np.histogram(
     data[DATE_COLUMN].dt.hour, bins=24, range=(0,24))[0]
 
+# print(hist_values)
+
 st.bar_chart(hist_values)
+
+st.subheader('Wildlife Sightings by Species - Global Data')
+
+sightings_species = sightings_data['BirdSpecies'].tolist()
+
+# print(sightings_species)
+
+sightings_count = sightings_data['Sightings'].tolist()
+
+# print(sightings_count)
+
+sightings_chart_data = pd.DataFrame(sightings_count, index=sightings_species)
+
+print(sightings_chart_data)
+
+st.bar_chart(sightings_chart_data)
 
 st.markdown("""---""")
 
