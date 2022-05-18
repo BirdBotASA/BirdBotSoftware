@@ -105,6 +105,7 @@ if run:
 
 while run:
     _, frame = vid.read()
+    FRAME_WINDOW.image(frame)
     frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
     image_data = image_preprocess(np.copy(frame), [input_size, input_size])
     image_data = image_data[np.newaxis, ...].astype(np.float32)
@@ -122,7 +123,7 @@ while run:
         
     frame = draw_bbox(frame, bboxes, CLASSES=CLASSES, rectangle_colors=rectangle_colors)
 	
-    FRAME_WINDOW.image(frame)
+    # FRAME_WINDOW.image(frame)
 
 with st.expander("See supported species"):
     species_data = pd.read_csv(SPECIES_LIST_URL)
