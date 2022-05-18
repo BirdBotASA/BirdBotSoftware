@@ -3,7 +3,8 @@ import pandas as pd
 import numpy as np
 import time
 import tensorflow as tf
-from yolov3.utils import detect_image, detect_realtime, detect_video, detect_ip_camera, Load_Yolo_model, detect_video_realtime_mp, generate_ml_data
+import cv2
+from yolov3.utils import *
 from yolov3.configs import *
 from yolov3.wallet import *
 from PIL import Image
@@ -20,6 +21,11 @@ DATE_COLUMN = 'date/time'
 SPECIES_COLUMN = 'Bird_Species_Triggered'
 DATA_URL = ('BirdBotStreamLitData.csv')
 SPECIES_LIST_URL = ('BirdBotStreamLitSpecies.csv')
+CLASSES=TRAIN_CLASSES
+input_size=YOLO_INPUT_SIZE
+score_threshold=0.5
+iou_threshold=0.3
+rectangle_colors=''
 image = ''
 LABEL = ''
 
@@ -32,24 +38,24 @@ def start_realtime():
     Wallet.close()
     detect_realtime(yolo, './YOLO_Videos/', camera_id=Camera_Number,  input_size=YOLO_INPUT_SIZE, show=True, CLASSES=TRAIN_CLASSES, rectangle_colors=(255, 0, 0), ALGORAND_WALLET=Wallet_Input)
 
-def start_predict():
+def start_predict(predict):
     yolo = Load_Yolo_model()
     uploadColumn, predictColumn = st.columns(2)
 
     with uploadColumn:
         st.subheader('Uploaded Image')
-        upload = Image.open(file)
-        with open(file.name,"wb") as f:
-            f.write(file.getbuffer())
+        upload = Image.open(predict)
+        with open(predict.name,"wb") as f:
+            f.write(predict.getbuffer())
         st.image(upload)
 
-    detect_image(yolo, file.name, input_size=YOLO_INPUT_SIZE, show=True, CLASSES=TRAIN_CLASSES, rectangle_colors=(255,0,0))
+    detect_image(yolo, predict.name, input_size=YOLO_INPUT_SIZE, show=True, CLASSES=TRAIN_CLASSES, rectangle_colors=(255,0,0))
 
     with predictColumn:
         st.subheader('BirdBot Image')
         st.image("temp.jpg")
         time.sleep(1)
-        os.remove(file.name)
+        os.remove(predict.name)
 
     with open('label.txt') as f:
         contents = f.read()
@@ -76,24 +82,58 @@ with st.sidebar:
     Camera_Input = st.text_input('Camera Name', BIRDBOT_CAMERA_NAME)
     IP_Input = st.text_input('IP Camera URL', IP_CAMERA_NAME)
     Camera_Number = st.number_input('Camera Number', step=1)
+    container = st.container()
     st.markdown("""---""")
     st.write('Algorand Wallet:', Wallet_Input)
     st.write('Camera Name:', Camera_Input)
     st.write('IP URL:', IP_Input)
     st.write('Camera Number:', Camera_Number)
 
+st.subheader("Detection Demos")
+
 file = st.file_uploader('Upload An Image', type=['jpg', 'jpeg'])
+
+if file:  # if user uploaded file    
+        start_predict(file)
+
+run = st.checkbox('Run webcam')
+FRAME_WINDOW = st.image([])
+vid = cv2.VideoCapture(Camera_Number)
+
+if run:
+    Yolo = Load_Yolo_model()
+
+while run:
+    _, frame = vid.read()
+    frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+    image_data = image_preprocess(np.copy(frame), [input_size, input_size])
+    image_data = image_data[np.newaxis, ...].astype(np.float32)
+
+    t1 = time.time()
+	
+    if YOLO_FRAMEWORK == "tf":
+        pred_bbox = Yolo.predict(image_data)
+	
+    pred_bbox = [tf.reshape(x, (-1, tf.shape(x)[-1])) for x in pred_bbox]
+    pred_bbox = tf.concat(pred_bbox, axis=0)
+
+    bboxes = postprocess_boxes(pred_bbox, frame, input_size, score_threshold)
+    bboxes = nms(bboxes, iou_threshold, method='nms')        
+        
+    frame = draw_bbox(frame, bboxes, CLASSES=CLASSES, rectangle_colors=rectangle_colors)
+	
+    FRAME_WINDOW.image(frame)
 
 with st.expander("See supported species"):
     species_data = pd.read_csv(SPECIES_LIST_URL)
 
     st.table(species_data)
 
-st.markdown("""---""")
+if container.button('Disconnect Camera'):
+    cv2.destroyAllWindows()
+    vid.release()
 
-if file:  # if user uploaded file
-        
-        start_predict()
+st.markdown("""---""")
 
 st.subheader('Number of Wildlife Sightings by Hour - Global Data')
 
@@ -112,9 +152,6 @@ st.subheader(f'Map of all Wildlife Sightings at {hour_to_filter}:00')
 st.map(filtered_data)
 
 st.markdown("""---""")
-
-if st.button('Start Real-Time Mode'):
-    start_realtime()
 
 if st.checkbox('Show raw data'):
     st.subheader('Raw data')
