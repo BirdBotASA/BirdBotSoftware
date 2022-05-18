@@ -96,43 +96,42 @@ file = st.file_uploader('Upload An Image', type=['jpg', 'jpeg'])
 if file:  # if user uploaded file    
         start_predict(file)
 
-run = st.checkbox('Run webcam')
-FRAME_WINDOW = st.image([])
-vid = cv2.VideoCapture(Camera_Number)
+# run = st.checkbox('Run webcam')
+# FRAME_WINDOW = st.image([])
+# vid = cv2.VideoCapture(Camera_Number)
 
-if run:
-    Yolo = Load_Yolo_model()
+# if run:
+    # Yolo = Load_Yolo_model()
 
-while run:
-    _, frame = vid.read()
-    FRAME_WINDOW.image(frame)
-    frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-    image_data = image_preprocess(np.copy(frame), [input_size, input_size])
-    image_data = image_data[np.newaxis, ...].astype(np.float32)
+# while run:
+    # _, frame = vid.read()
+    # frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+    # image_data = image_preprocess(np.copy(frame), [input_size, input_size])
+    # image_data = image_data[np.newaxis, ...].astype(np.float32)
 
-    t1 = time.time()
+    # t1 = time.time()
 	
-    if YOLO_FRAMEWORK == "tf":
-        pred_bbox = Yolo.predict(image_data)
+    # if YOLO_FRAMEWORK == "tf":
+        # pred_bbox = Yolo.predict(image_data)
 	
-    pred_bbox = [tf.reshape(x, (-1, tf.shape(x)[-1])) for x in pred_bbox]
-    pred_bbox = tf.concat(pred_bbox, axis=0)
+    # pred_bbox = [tf.reshape(x, (-1, tf.shape(x)[-1])) for x in pred_bbox]
+    # pred_bbox = tf.concat(pred_bbox, axis=0)
 
-    bboxes = postprocess_boxes(pred_bbox, frame, input_size, score_threshold)
-    bboxes = nms(bboxes, iou_threshold, method='nms')        
+    # bboxes = postprocess_boxes(pred_bbox, frame, input_size, score_threshold)
+    # bboxes = nms(bboxes, iou_threshold, method='nms')        
         
-    frame = draw_bbox(frame, bboxes, CLASSES=CLASSES, rectangle_colors=rectangle_colors)
+    # frame = draw_bbox(frame, bboxes, CLASSES=CLASSES, rectangle_colors=rectangle_colors)
 	
     # FRAME_WINDOW.image(frame)
 
+# if container.button('Disconnect Camera'):
+    # cv2.destroyAllWindows()
+    # vid.release()
+	
 with st.expander("See supported species"):
     species_data = pd.read_csv(SPECIES_LIST_URL)
 
     st.table(species_data)
-
-if container.button('Disconnect Camera'):
-    cv2.destroyAllWindows()
-    vid.release()
 
 st.markdown("""---""")
 
