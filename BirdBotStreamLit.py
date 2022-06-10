@@ -105,9 +105,9 @@ if file:  # if user uploaded file
 
 if run:
     Yolo = Load_Yolo_model()
-	run = st.checkbox('Run webcam')
-	FRAME_WINDOW = st.image([])
-	vid = cv2.VideoCapture(Camera_Number)
+    run = st.checkbox('Run webcam')
+    FRAME_WINDOW = st.image([])
+    vid = cv2.VideoCapture(Camera_Number)
 
 while run:
     _, frame = vid.read()
@@ -116,10 +116,10 @@ while run:
     image_data = image_data[np.newaxis, ...].astype(np.float32)
 
     t1 = time.time()
-	
+    
     if YOLO_FRAMEWORK == "tf":
         pred_bbox = Yolo.predict(image_data)
-	
+    
     pred_bbox = [tf.reshape(x, (-1, tf.shape(x)[-1])) for x in pred_bbox]
     pred_bbox = tf.concat(pred_bbox, axis=0)
 
@@ -127,15 +127,15 @@ while run:
     bboxes = nms(bboxes, iou_threshold, method='nms')        
         
     frame = draw_bbox(frame, bboxes, CLASSES=CLASSES, draw_rect=True, rectangle_colors=rectangle_colors)
-	
+    
     FRAME_WINDOW.image(frame)
 
 if container.button('Disconnect Camera'):
     cv2.destroyAllWindows()
     vid.release()
-	
+    
 ## REAL TIME MODE UNCOMMENT TO ACCESS ###
-	
+    
 with st.expander("See supported objects"):
     species_data = pd.read_csv(SPECIES_LIST_URL)
 
