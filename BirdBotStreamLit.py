@@ -34,13 +34,27 @@ rectangle_colors=''
 image = ''
 LABEL = ''
 
+@st.cache
+def load_data(nrows):
+    data = pd.read_csv(DATA_URL, nrows=nrows)
+    lowercase = lambda x: str(x).lower()
+    data.rename(lowercase, axis='columns', inplace=True)
+    data[DATE_COLUMN] = pd.to_datetime(data[DATE_COLUMN])
+    yolo = Load_Yolo_model()
+    return data, yolo
+    
+# Load 10,000 rows of data into the dataframe.
+data, yolo = load_data(10000)
+sightings_data = pd.read_csv(SIGHTINGS_URL)
+metrics_data = pd.read_csv(METRICS_URL)
+
 ## REAL TIME MODE UNCOMMENT TO ACCESS ###
 
 st.header("Real-Time Application - Page 1")
 
 class VideoProcessor:
     def __init__(self) -> None:
-        self.yolo = Load_Yolo_model()
+        self.yolo = yolo
         self.score_threshold = 0.30
 
     def recv(self, frame):
@@ -81,7 +95,6 @@ if ctx.video_processor:
 ## REAL TIME MODE UNCOMMENT TO ACCESS ###
 
 def start_predict(predict):
-    yolo = Load_Yolo_model()
     uploadColumn, predictColumn = st.columns(2)
 
     with uploadColumn:
@@ -104,19 +117,6 @@ def start_predict(predict):
     st.subheader('BirdBot Prediction:')
     st.text(contents)
     st.markdown("""---""")
-
-@st.cache
-def load_data(nrows):
-    data = pd.read_csv(DATA_URL, nrows=nrows)
-    lowercase = lambda x: str(x).lower()
-    data.rename(lowercase, axis='columns', inplace=True)
-    data[DATE_COLUMN] = pd.to_datetime(data[DATE_COLUMN])
-    return data
-    
-# Load 10,000 rows of data into the dataframe.
-data = load_data(10000)
-sightings_data = pd.read_csv(SIGHTINGS_URL)
-metrics_data = pd.read_csv(METRICS_URL)
 
 st.sidebar.title("BirdBot Settings Panel")
 st.sidebar.header("Camera Settings")
