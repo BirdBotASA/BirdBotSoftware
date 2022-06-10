@@ -109,27 +109,32 @@ if run:
     Yolo = Load_Yolo_model()
     FRAME_WINDOW = st.image([])
     vid = cv2.VideoCapture(Camera_Number)
+    print(vid)
 
-while run:
-    _, frame = vid.read()
-    frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-    image_data = image_preprocess(np.copy(frame), [input_size, input_size])
-    image_data = image_data[np.newaxis, ...].astype(np.float32)
-
-    t1 = time.time()
-    
-    if YOLO_FRAMEWORK == "tf":
-        pred_bbox = Yolo.predict(image_data)
-    
-    pred_bbox = [tf.reshape(x, (-1, tf.shape(x)[-1])) for x in pred_bbox]
-    pred_bbox = tf.concat(pred_bbox, axis=0)
-
-    bboxes = postprocess_boxes(pred_bbox, frame, input_size, score_threshold)
-    bboxes = nms(bboxes, iou_threshold, method='nms')        
+    while vid.isOpened():
+        ret, frame = vid.read()
         
-    frame = draw_bbox(frame, bboxes, CLASSES=CLASSES, draw_rect=True, rectangle_colors=rectangle_colors)
-    
-    FRAME_WINDOW.image(frame)
+        if not ret:
+            continue
+        
+        frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+        image_data = image_preprocess(np.copy(frame), [input_size, input_size])
+        image_data = image_data[np.newaxis, ...].astype(np.float32)
+
+        t1 = time.time()
+        
+        if YOLO_FRAMEWORK == "tf":
+            pred_bbox = Yolo.predict(image_data)
+        
+        pred_bbox = [tf.reshape(x, (-1, tf.shape(x)[-1])) for x in pred_bbox]
+        pred_bbox = tf.concat(pred_bbox, axis=0)
+
+        bboxes = postprocess_boxes(pred_bbox, frame, input_size, score_threshold)
+        bboxes = nms(bboxes, iou_threshold, method='nms')        
+            
+        frame = draw_bbox(frame, bboxes, CLASSES=CLASSES, draw_rect=True, rectangle_colors=rectangle_colors)
+        
+        FRAME_WINDOW.image(frame)
 
 if container.button('Disconnect Camera'):
     cv2.destroyAllWindows()
