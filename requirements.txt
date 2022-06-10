@@ -17,6 +17,7 @@ awscli
 pybase64
 requests
 tk
+av
 emoji
 python-decouple
 python-vlc
