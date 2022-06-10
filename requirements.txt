@@ -21,3 +21,4 @@ emoji
 python-decouple
 python-vlc
 pytesseract
+streamlit-webrtc

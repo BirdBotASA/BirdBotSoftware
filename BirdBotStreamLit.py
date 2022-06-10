@@ -1,6 +1,7 @@
 import streamlit as st
 import pandas as pd
 import numpy as np
+import av
 import time
 import tensorflow as tf
 import cv2
@@ -8,6 +9,7 @@ from yolov3.utils import *
 from yolov3.configs import *
 from yolov3.wallet import *
 from PIL import Image
+from streamlit_webrtc import webrtc_streamer
 import os
 
 st.set_page_config(
@@ -32,14 +34,48 @@ rectangle_colors=''
 image = ''
 LABEL = ''
 
-def start_realtime():
-    yolo = Load_Yolo_model()
-    Wallet = open("B:\BirdBot\BirdKeras\TensorFlow2\yolov3\wallet.py", "w")
-    Wallet.write("BIRDBOT_CAMERA_NAME         = " + "\'" + Camera_Input + "\'" + "\n")
-    Wallet.write("ALGORAND_WALLET             = " + "\'" + Wallet_Input + "\'"+ "\n")
-    Wallet.write("IP_CAMERA_NAME             = " + "\'" + IP_Input + "\'")
-    Wallet.close()
-    detect_realtime(yolo, './YOLO_Videos/', camera_id=Camera_Number,  input_size=YOLO_INPUT_SIZE, show=True, CLASSES=TRAIN_CLASSES, rectangle_colors=(255, 0, 0), ALGORAND_WALLET=Wallet_Input)
+## REAL TIME MODE UNCOMMENT TO ACCESS ###
+
+st.header("Real-Time Application - Page 1")
+
+class VideoProcessor:
+    def __init__(self) -> None:
+        self.yolo = Load_Yolo_model()
+        self.score_threshold = 0.30
+
+    def recv(self, frame):
+
+        frame = frame.to_ndarray(format="bgr24")
+
+        img = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+        image_data = image_preprocess(np.copy(img), [input_size, input_size])
+        image_data = image_data[np.newaxis, ...].astype(np.float32)
+
+        t1 = time.time()
+        
+        if YOLO_FRAMEWORK == "tf":
+            pred_bbox = self.yolo.predict(image_data)
+        
+        pred_bbox = [tf.reshape(x, (-1, tf.shape(x)[-1])) for x in pred_bbox]
+        pred_bbox = tf.concat(pred_bbox, axis=0)
+
+        bboxes = postprocess_boxes(pred_bbox, img, input_size, self.score_threshold)
+        bboxes = nms(bboxes, iou_threshold, method='nms')        
+            
+        img = draw_bbox(img, bboxes, CLASSES=CLASSES, draw_rect=True, rectangle_colors=rectangle_colors)
+
+        return av.VideoFrame.from_ndarray(img)
+
+ctx = webrtc_streamer(
+    key="example",
+    video_processor_factory=VideoProcessor,
+)
+
+if ctx.video_processor:
+    print("TRUE")
+    ctx.video_processor.score_threshold = st.slider("Accuracy Threshold", min_value=0.00, max_value=1.00, step=0.01, value=0.30)
+
+## REAL TIME MODE UNCOMMENT TO ACCESS ###
 
 def start_predict(predict):
     yolo = Load_Yolo_model()
@@ -94,54 +130,13 @@ with st.sidebar:
     st.write('IP URL:', IP_Input)
     st.write('Camera Number:', Camera_Number)
 
-st.header("Detection Demos")
+st.header("Photo Application - Page 2")
 
 file = st.file_uploader('Upload An Image', type=['jpg', 'jpeg'])
 
 if file:  # if user uploaded file    
         start_predict(file)
 
-## REAL TIME MODE UNCOMMENT TO ACCESS ###
-
-run = st.checkbox('Run webcam')
-
-if run:
-    Yolo = Load_Yolo_model()
-    FRAME_WINDOW = st.image([])
-    vid = cv2.VideoCapture(Camera_Number)
-    print(vid)
-
-    while vid.isOpened():
-        ret, frame = vid.read()
-        
-        if not ret:
-            continue
-        
-        frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-        image_data = image_preprocess(np.copy(frame), [input_size, input_size])
-        image_data = image_data[np.newaxis, ...].astype(np.float32)
-
-        t1 = time.time()
-        
-        if YOLO_FRAMEWORK == "tf":
-            pred_bbox = Yolo.predict(image_data)
-        
-        pred_bbox = [tf.reshape(x, (-1, tf.shape(x)[-1])) for x in pred_bbox]
-        pred_bbox = tf.concat(pred_bbox, axis=0)
-
-        bboxes = postprocess_boxes(pred_bbox, frame, input_size, score_threshold)
-        bboxes = nms(bboxes, iou_threshold, method='nms')        
-            
-        frame = draw_bbox(frame, bboxes, CLASSES=CLASSES, draw_rect=True, rectangle_colors=rectangle_colors)
-        
-        FRAME_WINDOW.image(frame)
-
-if container.button('Disconnect Camera'):
-    cv2.destroyAllWindows()
-    vid.release()
-    
-## REAL TIME MODE UNCOMMENT TO ACCESS ###
-    
 with st.expander("See supported objects"):
     species_data = pd.read_csv(SPECIES_LIST_URL)
 
