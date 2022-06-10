@@ -103,9 +103,10 @@ if file:  # if user uploaded file
 
 ## REAL TIME MODE UNCOMMENT TO ACCESS ###
 
+run = st.checkbox('Run webcam')
+
 if run:
     Yolo = Load_Yolo_model()
-    run = st.checkbox('Run webcam')
     FRAME_WINDOW = st.image([])
     vid = cv2.VideoCapture(Camera_Number)
 
