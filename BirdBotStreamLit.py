@@ -118,7 +118,7 @@ st.header("IP Application")
 
 run = st.checkbox('Run IP Camera')
 FRAME_WINDOW = st.image([])
-vid = cv2.VideoCapture(IP_CAMERA_NAME)
+vid = cv2.VideoCapture(IP_Input)
 
 if run:
     ip_score_threshold = st.slider("IP Accuracy Threshold", min_value=0.00, max_value=1.00, step=0.01, value=0.30, key=2)
