@@ -50,7 +50,7 @@ metrics_data = pd.read_csv(METRICS_URL)
 
 ## REAL TIME MODE UNCOMMENT TO ACCESS ###
 
-st.header("Real-Time Application - Page 1")
+st.header("Webcam Application")
 
 class VideoProcessor:
     def __init__(self) -> None:
@@ -74,7 +74,7 @@ class VideoProcessor:
         pred_bbox = tf.concat(pred_bbox, axis=0)
 
         bboxes = postprocess_boxes(pred_bbox, img, input_size, self.score_threshold)
-        bboxes = nms(bboxes, iou_threshold, method='nms')        
+        bboxes = nms(bboxes, iou_threshold, method='nms')
             
         img = draw_bbox(img, bboxes, CLASSES=CLASSES, draw_rect=True, rectangle_colors=rectangle_colors)
 
@@ -90,9 +90,65 @@ ctx = webrtc_streamer(
 
 if ctx.video_processor:
     print("TRUE")
-    ctx.video_processor.score_threshold = st.slider("Accuracy Threshold", min_value=0.00, max_value=1.00, step=0.01, value=0.30)
+    ctx.video_processor.score_threshold = st.slider("Webcam Accuracy Threshold", min_value=0.00, max_value=1.00, step=0.01, value=0.30, key=1)
 
 ## REAL TIME MODE UNCOMMENT TO ACCESS ###
+st.sidebar.title("BirdBot Settings Panel")
+st.sidebar.header("Camera Settings")
+
+with st.sidebar:
+    Wallet_Input = st.text_input('Algorand Wallet', ALGORAND_WALLET)
+    Camera_Input = st.text_input('Camera Name', BIRDBOT_CAMERA_NAME)
+    IP_Input = st.text_input('IP Camera URL', IP_CAMERA_NAME)
+    Camera_Number = st.number_input('Camera Number', step=1)
+    container = st.container()
+    st.markdown("""---""")
+    Wallet = open("yolov3\wallet.py", "w")
+    Wallet.write("BIRDBOT_CAMERA_NAME         = " + "\'" + Camera_Input + "\'" + "\n")
+    Wallet.write("ALGORAND_WALLET             = " + "\'" + Wallet_Input + "\'"+ "\n")
+    Wallet.write("IP_CAMERA_NAME             = " + "\'" + IP_Input + "\'"+ "\n")
+    Wallet.write("CAMERA_NUMBER             = " + "\'" + str(Camera_Number) + "\'")
+    Wallet.close()
+    st.write('Algorand Wallet:', Wallet_Input)
+    st.write('Camera Name:', Camera_Input)
+    st.write('IP URL:', IP_Input)
+    st.write('Camera Number:', Camera_Number)
+
+st.header("IP Application")
+
+run = st.checkbox('Run IP Camera')
+FRAME_WINDOW = st.image([])
+vid = cv2.VideoCapture(IP_CAMERA_NAME)
+
+if run:
+    ip_score_threshold = st.slider("IP Accuracy Threshold", min_value=0.00, max_value=1.00, step=0.01, value=0.30, key=2)
+
+while run:
+    _, frame = vid.read()
+    frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+    image_data = image_preprocess(np.copy(frame), [input_size, input_size])
+    image_data = image_data[np.newaxis, ...].astype(np.float32)
+
+    t1 = time.time()
+
+    if YOLO_FRAMEWORK == "tf":
+        pred_bbox = yolo.predict(image_data)
+
+    pred_bbox = [tf.reshape(x, (-1, tf.shape(x)[-1])) for x in pred_bbox]
+    pred_bbox = tf.concat(pred_bbox, axis=0)
+
+    bboxes = postprocess_boxes(pred_bbox, frame, input_size, ip_score_threshold)
+    bboxes = nms(bboxes, iou_threshold, method='nms')        
+
+    frame = draw_bbox(frame, bboxes, CLASSES=CLASSES, rectangle_colors=rectangle_colors)
+
+    FRAME_WINDOW.image(frame)
+else:
+    cv2.destroyAllWindows()
+
+if container.button('Disconnect Camera'):
+    cv2.destroyAllWindows()
+    vid.release()
 
 def start_predict(predict):
     uploadColumn, predictColumn = st.columns(2)
@@ -118,22 +174,7 @@ def start_predict(predict):
     st.text(contents)
     st.markdown("""---""")
 
-st.sidebar.title("BirdBot Settings Panel")
-st.sidebar.header("Camera Settings")
-
-with st.sidebar:
-    Wallet_Input = st.text_input('Algorand Wallet', ALGORAND_WALLET)
-    Camera_Input = st.text_input('Camera Name', BIRDBOT_CAMERA_NAME)
-    IP_Input = st.text_input('IP Camera URL', IP_CAMERA_NAME)
-    Camera_Number = st.number_input('Camera Number', step=1)
-    container = st.container()
-    st.markdown("""---""")
-    st.write('Algorand Wallet:', Wallet_Input)
-    st.write('Camera Name:', Camera_Input)
-    st.write('IP URL:', IP_Input)
-    st.write('Camera Number:', Camera_Number)
-
-st.header("Photo Application - Page 2")
+st.header("Photo Application")
 
 file = st.file_uploader('Upload An Image', type=['jpg', 'jpeg'])
 
@@ -197,7 +238,7 @@ st.bar_chart(sightings_chart_data)
 st.markdown("""---""")
 
 st.subheader('Use Slider to Adjust Time of Day')
-hour_to_filter = st.slider('Hour', 0, 23, 17)  # min: 0h, max: 23h, default: 17h
+hour_to_filter = st.slider('Hour', 0, 23, 17, key=3)  # min: 0h, max: 23h, default: 17h
 filtered_data = data[data[DATE_COLUMN].dt.hour == hour_to_filter]
 st.subheader(f'Map of all Wildlife Sightings at {hour_to_filter}:00')
 
