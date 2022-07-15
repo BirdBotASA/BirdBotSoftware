@@ -21,10 +21,10 @@ st.title("BirdBot - Machine Learning dApp")
 
 DATE_COLUMN = 'date/time'
 SPECIES_COLUMN = 'Bird_Species_Triggered'
-DATA_URL = ('BirdBotStreamlitData.csv')
-SPECIES_LIST_URL = ('BirdBotStreamlitSpecies.csv')
-METRICS_URL = ('BirdBotStreamlitMetrics.csv')
-SIGHTINGS_URL = ('BirdBotStreamlitSightings.csv')
+DATA_URL = ('data/BirdBotStreamlitData.csv')
+SPECIES_LIST_URL = ('data/BirdBotStreamlitSpecies.csv')
+METRICS_URL = ('data/BirdBotStreamlitMetrics.csv')
+SIGHTINGS_URL = ('data/BirdBotStreamlitSightings.csv')
 
 CLASSES=TRAIN_CLASSES
 input_size=YOLO_INPUT_SIZE
