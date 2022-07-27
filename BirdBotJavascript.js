@@ -1,18 +1,17 @@
-
 geoUrlAPI = "https://json.geoiplookup.io/"
 
 geoResponse = httpGet(geoUrlAPI);
 const geoJSON = JSON.parse(geoResponse);
-// console.log(geoJSON);
+console.log(geoJSON);
 
 const approxCity = geoJSON.city;
-// console.log(approxCity);
+console.log(approxCity);
 
 const approxLat =  geoJSON.latitude;
-// console.log(approxLat);
+console.log(approxLat);
 
 const approxLong =  geoJSON.longitude;
-// console.log(approxLong);
+console.log(approxLong);
 
 // configs
 var threshold = 0.70;
@@ -20,7 +19,6 @@ var threshold = 0.70;
 let labels = ["Tyler Odenthal"];
 let ASA_id = '478549868'
 let fps;
-let fpsTag = document.getElementById('FPSTag');
 let lastSeen = 'Waiting';
 let lastTime = 'Waiting';
 let lastSeenArray = [];
@@ -33,7 +31,6 @@ var webcamSection = document.getElementById('webcamSection');
 var enableWebcamButton = document.getElementById('webcamButton');
 var ZoomButtons = document.getElementById('ZoomButtons');
 var sliderContent = document.getElementById('sliderContent');
-var audioOn = true;
 
 var pos = document.getElementById("pos");
 
@@ -85,25 +82,6 @@ function submit() {
     
 }
 
-function audioSwitch() {
-    // Get the checkbox
-    var AudioToggle = document.getElementById('AudioToggle');
-    var audioOutput = document.getElementById('AudioToggle')
-
-    audioOutput.innerHTML = AudioToggle.checked;
-
-    // If the checkbox is checked, display the output text
-    if (AudioToggle.checked == true){
-        console.log("Toggle On");
-        var audioOn = true;
-        video.srcObject.getAudioTracks()[0].enabled = audioOn; // or false to mute it.
-    } else {
-        console.log("Toggle Off");
-        var audioOn = false;
-        video.srcObject.getAudioTracks()[0].enabled = audioOn; // or false to mute it.
-    }
-}
-
 // Do an HTTP Get Request
 function httpGet(theUrl) {
     let xmlHttpReq = new XMLHttpRequest();
@@ -127,20 +105,16 @@ function zoomOut() {
     video.style.width = camHeight + 'px'
 }
 
-var vidSlider = document.getElementById("vidScaleRange");
-var vidSliderOutput = document.getElementById("vidScaleOutput");
-vidSliderOutput.innerHTML = vidSlider.value;
-
-var confSlider = document.getElementById("confScaleRange");
-var confSliderOutput = document.getElementById("confScaleOutput");
-confSliderOutput.innerHTML = confSlider.value;
+var slider = document.getElementById("vidScaleRange");
+var output = document.getElementById("scaleOutput");
+output.innerHTML = slider.value;
 
 var camWidth = 720;
 var camHeight = 720;
 var screenWidth = screen.width;
 var screenHeight = screen.height;
 var screenPadding = 30;
-var screenRatio = vidSlider.value;
+var screenRatio = slider.value;
 
 // Check if webcam access is supported.
 function getUserMediaSupported() {
@@ -164,12 +138,12 @@ function enableCam(event) {
     }
     
     // Hide the button once clicked.
-    webcamSection.setAttribute("hidden", "hidden");
+    event.target.classList.add('removed');
     ZoomButtons.removeAttribute("hidden");
     sliderContent.removeAttribute("hidden");
 
     // Activate the webcam stream.
-    navigator.mediaDevices.getUserMedia({audio: audioOn, video: { width: camWidth, height: camHeight, facingMode: 'user' }}).then(function(stream) {
+    navigator.mediaDevices.getUserMedia({audio: true, video: { width: camWidth, height: camHeight, facingMode: 'environment' }}).then(function(stream) {
         video.style = 'margin-left: ' + ((screenWidth / screenRatio) + screenPadding) + 'px;'
         video.srcObject = stream;
         video.addEventListener('loadeddata', predictWebcam);
@@ -207,8 +181,7 @@ function predictWebcam() {
 
     tf.engine().startScope();
 
-    vidSliderOutput.innerHTML = vidSlider.value;
-    confSliderOutput.innerHTML = confSlider.value;
+    output.innerHTML = slider.value;
 
     let [modelWidth, modelHeight] = model.inputs[0].shape.slice(1, 3);
 
@@ -239,8 +212,8 @@ function predictWebcam() {
         
         children.splice(0);
 
-        vidSlider.oninput = function() {
-            vidSliderOutput.innerHTML = this.value;
+        slider.oninput = function() {
+            output.innerHTML = this.value;
             screenRatio = this.value;
             adjustedWidth = ((screenWidth / screenRatio) + screenPadding);
             video.style = 'margin-left: ' + adjustedWidth + 'px;'
@@ -248,30 +221,26 @@ function predictWebcam() {
             video.style.width = camHeight + 'px'
             console.log(adjustedWidth);
         }
-
-        confSlider.oninput = function() {
-            confSliderOutput.innerHTML = this.value;
-            threshold = (this.value / 100);
-            console.log(threshold);
-        }
         
         // Construct the FPS Visual Widget
-        fpsTag.innerText = 'FPS: ' + fps;
+        const currentFPS = document.createElement('p');
+
+        currentFPS.innerText = 'FPS: ' + fps;
                 
-        fpsTag.style = 'margin-left: ' + ((screenWidth / screenRatio) + screenPadding + 20) + 'px;';
+        currentFPS.style = 'margin-left: ' + ((screenWidth / screenRatio) + screenPadding) + 'px;';
 
-        liveView.prepend(fpsTag);
+        liveView.appendChild(currentFPS);
 
-        children.push(fpsTag);
+        children.push(currentFPS);
 
         // Construct the Last Seen Visual Widget
         const lastSeenWidget = document.createElement('p');
 
         lastSeenWidget.innerText = 'Last Seen: ' + lastSeen + ' - ' + lastTime;
                 
-        lastSeenWidget.style = 'margin-left: ' + ((screenWidth / screenRatio) + screenPadding + 90) + 'px;';
+        lastSeenWidget.style = 'margin-left: ' + ((screenWidth / screenRatio) + screenPadding + 70) + 'px;';
 
-        liveView.prepend(lastSeenWidget);
+        liveView.appendChild(lastSeenWidget);
 
         children.push(lastSeenWidget);
 
