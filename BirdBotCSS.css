@@ -30,6 +30,9 @@ section {
     margin-bottom: 20px;
     margin-left: 20%;
     margin-right: 20%;
+    text-shadow: 0 0 2px #000; /* horizontal-offset vertical-offset 'blur' colour */
+    -moz-text-shadow: 0 0 2px #000;
+    -webkit-text-shadow: 0 0 2px #000;
 }
 
 .centerInputs {
