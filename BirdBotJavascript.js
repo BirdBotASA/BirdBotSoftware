@@ -28,7 +28,7 @@ const times = [];
 
 var video = document.getElementById('webcam');
 var liveView = document.getElementById('liveView');
-var webcamSection = document.getElementById('webcamSection');
+var cameraButtonSection = document.getElementById('cameraButtonSection');
 var enableWebcamButton = document.getElementById('webcamButton');
 var ZoomButtons = document.getElementById('ZoomButtons');
 var sliderContent = document.getElementById('sliderContent');
@@ -43,6 +43,7 @@ function submit() {
     var AlgoAddress = document.getElementById('AlgoAddress');
     var CameraName = document.getElementById('CameraName');
     var RTSPName = document.getElementById('RTSPName');
+    var RTSPButton = document.getElementById('rtspButton');
     
     // Hide Algorand Input Boxes
     AlgoContent.style.display = "none";
@@ -50,12 +51,14 @@ function submit() {
     // Create Section for Inputed Algorand Information  
     var NewAlgoSection = document.getElementById('NewAlgoSection');
     var SetAlgoContent = document.createElement("p");
+    var SetRTSPContent = document.createElement("p");
     
     // Append P element to New Algorand Section
     NewAlgoSection.appendChild(SetAlgoContent);
+    NewAlgoSection.appendChild(SetRTSPContent);
 
     // Show Webcam Section
-    webcamSection.removeAttribute("hidden");
+    cameraButtonSection.removeAttribute("hidden");
 
     // Run HTTP Get Request 
     url = 'https://node.algoexplorerapi.io/v2/accounts/' + AlgoAddress.value + '/assets/' + ASA_id;
@@ -69,19 +72,45 @@ function submit() {
     } else {
         var accountBalance = 0;
     }
+
+    if (RTSPName.value.includes("rtsp://")) {
+        var RtspConfirmed = "Valid";
+        RTSPButton.removeAttribute("hidden");
+        console.log("CONFIRMED RTSP URL");
+        SetRTSPContent.innerText = 'RTSP URL: ' + RTSPName.value + '\n\n' + 'Valid URL: ' + RtspConfirmed;
+        SetRTSPContent.style.backgroundColor = "rgba(0, 155, 0, 0.6)";
+        SetRTSPContent.style.padding = "20px";
+    } else {
+        var RtspConfirmed = "Not Valid";
+        RTSPButton.setAttribute("hidden", "hidden");
+        SetRTSPContent.innerText = 'RTSP URL: ' + RTSPName.value + '\n\n' + 'Valid URL: ' + RtspConfirmed;
+        SetRTSPContent.style.backgroundColor = "rgba(240, 55, 33, 0.6)";
+        SetRTSPContent.style.padding = "20px";
+    }
     
     if (accountBalance > 0) {
-        var walletConnected = "Successful";
-        SetAlgoContent.innerText = 'Wallet Connected: ' + walletConnected + '\n\n' + 'Algorand Address: ' + AlgoAddress.value + '\n\n' + 'Approximate City: ' + approxCity + '\n\n' + 'Camera Name: ' + CameraName.value + '\n\n' + 'BIRDS Balance: ' + accountBalance.toLocaleString("en-US") + '\n\n' + 'RTSP URL: ' + RTSPName.value;
+        var walletConnected = "Wallet Connected: Successful";
+        SetAlgoContent.innerText = walletConnected + '\n\n' + 'Algorand Address: ' + truncate(AlgoAddress.value, 8) + '\n\n' + 'Approximate City: ' + approxCity + '\n\n' + 'Camera Name: ' + CameraName.value + '\n\n' + 'BIRDS Balance: ' + accountBalance.toLocaleString("en-US");
         SetAlgoContent.style.backgroundColor = "rgba(0, 155, 0, 0.6)";
         SetAlgoContent.style.padding = "20px";
+        
     } else {
-        var walletConnected = "Not Connected";
-        SetAlgoContent.innerText = 'Wallet Connected: ' + walletConnected + '\n\n' + 'Camera Name: ' + CameraName.value + '\n\n' + 'RTSP URL: ' + RTSPName.value;
+        var walletConnected = "Wallet Connected: Unsuccessful";
+        SetAlgoContent.innerText = walletConnected + '\n\n' + 'Camera Name: ' + CameraName.value ;
         SetAlgoContent.style.backgroundColor = "rgba(240, 55, 33, 0.6)";
         SetAlgoContent.style.padding = "20px";
     }
     
+}
+
+function goBack() {
+
+    // Show Webcam Section
+    cameraButtonSection.setAttribute("hidden", "hidden");
+    NewAlgoSection.removeChild(NewAlgoSection.childNodes[0]);
+    NewAlgoSection.removeChild(NewAlgoSection.childNodes[0]);
+    AlgoContent.style.display = "block";
+
 }
 
 function audioSwitch() {
@@ -111,6 +140,10 @@ function httpGet(theUrl) {
     responseStatus = xmlHttpReq.status;
     return xmlHttpReq.responseText;
 }
+
+function truncate(str, n) {
+    return (str.length > n) ? str.substr(0, n-1) + '...' : str;
+};
 
 function zoomIn() {
     camWidth = 1080;
@@ -163,7 +196,31 @@ function enableCam(event) {
     }
     
     // Hide the button once clicked.
-    webcamSection.setAttribute("hidden", "hidden");
+    cameraButtonSection.setAttribute("hidden", "hidden");
+    ZoomButtons.removeAttribute("hidden");
+    sliderContent.removeAttribute("hidden");
+
+    // Activate the webcam stream.
+    navigator.mediaDevices.getUserMedia({audio: audioOn, video: { width: camWidth, height: camHeight, facingMode: 'user' }}).then(function(stream) {
+        video.style = 'margin-left: ' + ((screenWidth / screenRatio) + screenPadding) + 'px;'
+        video.srcObject = stream;
+        video.addEventListener('loadeddata', predictWebcam);
+    });
+}
+
+//////////////////////////////////////////////////////////
+//                     WORKING HERE                     //
+// Enable the live webcam view and start classification.//
+//                                                      //
+//////////////////////////////////////////////////////////
+function enableRTSP() {
+    // Only continue if model loads.
+    if (!model) {
+        return;
+    }
+    
+    // Hide the button once clicked.
+    cameraButtonSection.setAttribute("hidden", "hidden");
     ZoomButtons.removeAttribute("hidden");
     sliderContent.removeAttribute("hidden");
 
