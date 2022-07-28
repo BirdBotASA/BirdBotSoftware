@@ -1,113 +1,122 @@
 body {
-    font-family: helvetica, arial, sans-serif;
-    margin: 2em;
-    color: #3D3D3D;
-    background-color: rgba(0, 0, 0, 0.05);
+	font-family: helvetica, arial, sans-serif;
+	margin: 2em;
+	color: #3D3D3D;
+	background-color: rgba(0, 0, 0, 0.05);
 }
 
 h1 {
-    font-style: italic;
-    color: #FFA949;
-    text-shadow: 0 0 2px #000; /* horizontal-offset vertical-offset 'blur' colour */
-    -moz-text-shadow: 0 0 2px #000;
-    -webkit-text-shadow: 0 0 2px #000;
+	font-style: italic;
+	color: #FFA949;
+	text-shadow: 0 1px 0 #ccc, 
+		0 2px 0 rgb(223, 223, 223),
+		0 3px 0 rgb(223, 223, 223),
+		0 4px 0 rgb(223, 223, 223),
+		0 5px 0 rgb(223, 223, 223),
+		0 6px 1px rgba(0,0,0,.1),
+		0 0 5px rgba(0,0,0,.1),
+		0 1px 3px rgba(0,0,0,.3),
+		0 3px 5px rgba(0,0,0,.2),
+		0 5px 10px rgba(0,0,0,.25),
+		0 10px 10px rgba(0,0,0,.2),
+		0 20px 20px rgba(0,0,0,.15);
 }
 
 video {
-    display: block;
+	display: block;
 }
 
 section {
-    opacity: 1;
-    transition: opacity 500ms ease-in-out;
+	opacity: 1;
+	transition: opacity 500ms ease-in-out;
 }
 
 .centerHeader {
-    border: 5px solid #FFA949;
-    text-align: center;
-    padding: 20px;
-    margin-top: 20px;
-    margin-bottom: 20px;
-    margin-left: 20%;
-    margin-right: 20%;
-    text-shadow: 0 0 2px #000; /* horizontal-offset vertical-offset 'blur' colour */
-    -moz-text-shadow: 0 0 2px #000;
-    -webkit-text-shadow: 0 0 2px #000;
+	border: 5px solid #FFA949;
+	text-align: center;
+	padding: 20px;
+	margin-top: 20px;
+	margin-bottom: 20px;
+	margin-left: 20%;
+	margin-right: 20%;
+	text-shadow: 0 0 2px #000; /* horizontal-offset vertical-offset 'blur' colour */
+	-moz-text-shadow: 0 0 2px #000;
+	-webkit-text-shadow: 0 0 2px #000;
 }
 
 .centerInputs {
-    text-align: center;
-    margin-bottom: 20px;
-    margin-left: 20%;
-    margin-right: 20%;
+	text-align: center;
+	margin-bottom: 20px;
+	margin-left: 20%;
+	margin-right: 20%;
 }
-    
+	
 .removed {
-    display: none;
+	display: none;
 }
 
 .invisible {
-    opacity: 0.2;
+	opacity: 0.2;
 }
 
 .camView {
-    position: relative;
-    float: left;
-    width: 100%;
-    margin: 10px;
-    cursor: pointer;
+	position: relative;
+	float: left;
+	width: 100%;
+	margin: 10px;
+	cursor: pointer;
 }
 
 .camView p {
-    position: absolute;
-    padding: 5px;
-    background-color: rgba(255, 111, 0, 0.85);
-    color: #FFF;
-    border: 1px dashed rgba(255, 255, 255, 0.7);
-    z-index: 2;
-    font-size: 12px;
+	position: absolute;
+	padding: 5px;
+	background-color: rgba(255, 111, 0, 0.85);
+	color: #FFF;
+	border: 1px dashed rgba(255, 255, 255, 0.7);
+	z-index: 2;
+	font-size: 12px;
 }
 
 .highlighter {
-    position: absolute;
-    background: rgba(20, 73, 20, 0.25);
-    border: 1px dashed #fff;
-    z-index: 1;
+	position: absolute;
+	background: rgba(20, 73, 20, 0.25);
+	border: 1px dashed #fff;
+	z-index: 1;
 }
 
 .slidecontainer {
-    width: 100%;
+	width: 100%;
 }
 
 .slider {
-    -webkit-appearance: none;
-    width: 25%;
-    height: 25px;
-    background: #d3d3d3;
-    outline: none;
-    opacity: 0.7;
-    -webkit-transition: .2s;
-    transition: opacity .2s;
+	-webkit-appearance: none;
+	width: 25%;
+	height: 25px;
+	background: #d3d3d3;
+	outline: none;
+	opacity: 0.7;
+	-webkit-transition: .2s;
+	transition: opacity .2s;
 }
 
 .slider:hover {
-    opacity: 1;
+	opacity: 1;
 }
 
 .slider::-webkit-slider-thumb {
-    -webkit-appearance: none;
-    appearance: none;
-    width: 25px;
-    height: 25px;
-    background: #04AA6D;
-    cursor: pointer;
+	-webkit-appearance: none;
+	appearance: none;
+	width: 25px;
+	height: 25px;
+	background: #04AA6D;
+	cursor: pointer;
 }
 
 .slider::-moz-range-thumb {
-    width: 25px;
-    height: 25px;
-    background: #04AA6D;
-    cursor: pointer;
+	width: 25px;
+	height: 25px;
+	background: #04AA6D;
+	cursor: pointer;
 }
 
 .switch {
