@@ -16,7 +16,7 @@ const approxLong =  geoJSON.longitude;
 // configs
 var threshold = 0.70;
 
-let labels = ["Tyler Odenthal"];
+let labels = ["Abert's Towhee", "Allen's Hummingbird", "Ruby-throated Hummingbird", "Rufous Hummingbird", "American Crow", "Northern Mockingbird", "American Goldfinch", "Pine Siskin", "House Finch - Female", "Chestnut-backed Chickadee", "House Sparrow", "Golden-crowned Sparrow", "Black-capped Chickadee", "Steller's Jay", "American Robin", "Eastern Towhee", "American Tree Sparrow", "Anna's Hummingbird", "Ash-throated Flycatcher", "Bald Eagle", "Baltimore Oriole", "Barn Swallow", "Cedar Waxwing", "Bewick's Wren", "Verdin", "Black_Phoebe", "House Wren", "Mountain Chickadee", "Dark-eyed Junco", "Red-breasted Nuthatch", "House Finch - Male", "Townsend's Warbler", "European Starling", "Black-chinned Hummingbird", "Black-crested Titmouse", "Black-headed Grosbeak", "Black-headed Grosbeak - Female", "White-crowned Sparrow", "Red-winged Blackbird", "Brown-headed Cowbird", "Western Bluebird", "Common Grackle", "Bullock's Oriole", "Black-billed Magpie", "Black Bear", "Black Vulture", "Common Raven", "Osprey", "Carolina Wren", "California Scrub-Jay", "Turkey Vulture", "Northern Cardinal", "Eastern Phoebe", "Blue Jay", "Brewer's Blackbird", "Great-tailed Grackle", "California Towhee", "Grey Catbird", "Rock Pigeon", "Broad-tailed Hummingbird", "Bushtit", "Eurasian Collared-Dove", "Western Tanager", "White-breasted Nuthatch", "Pine Warbler", "Common Yellowthroat", "Cooper's Hawk", "Cactus Wren", "Say's Phoebe", "Song Sparrow", "Carolina Chickadee", "Ruby-crowned Kinglet", "Red-bellied Woodpecker", "Red-headed Woodpecker", "Chimney Swift", "Chipping Sparrow", "Clay-colored Sparrow", "Common Redpoll", "Curve-billed Thrasher", "Purple Finch", "Northern Flicker", "Downy Woodpecker", "Tufted Titmouse", "Eastern Bluebird", "Eastern Kingbird", "Eastern Meadowlark", "Mourning Dove", "Gambel's Quail", "Gila Woodpecker", "Golden-fronted Woodpecker", "Horned Lark", "House Fire", "Indigo Bunting", "Killdeer", "Ladder-backed Woodpecker", "Lesser Goldfinch", "Loggerhead Shrike", "Mountain Bluebird", "Oak Titmouse", "Orange-crowned Warbler", "Orchard Oriole", "Osprey - Chick", "Osprey - Egg", "Painted Bunting", "Phainopepla", "Red-shouldered Hawk", "Western Kingbird", "Yellow_rumped_Warbler", "Spotted Towhee", "Savannah Sparrow", "Western Meadowlark", "Wild Boar", "Yellow Warbler"];
 let ASA_id = '478549868'
 let fps;
 let fpsTag = document.getElementById('FPSTag');
@@ -33,6 +33,7 @@ var enableWebcamButton = document.getElementById('webcamButton');
 var ZoomButtons = document.getElementById('ZoomButtons');
 var sliderContent = document.getElementById('sliderContent');
 var audioOn = true;
+var videoOn = true;
 
 var pos = document.getElementById("pos");
 
@@ -61,12 +62,12 @@ function submit() {
     cameraButtonSection.removeAttribute("hidden");
 
     // Run HTTP Get Request 
-    url = 'https://node.algoexplorerapi.io/v2/accounts/' + AlgoAddress.value + '/assets/' + ASA_id;
-    response = httpGet(url);
-    console.log(response);
+    AlgoExplorerAPI = 'https://node.algoexplorerapi.io/v2/accounts/' + AlgoAddress.value + '/assets/' + ASA_id;
+    AlgoExplorerResponse = httpGet(AlgoExplorerAPI);
+    console.log(AlgoExplorerResponse);
 
     if (responseStatus == 200) {
-        var obj = JSON.parse(response)
+        var obj = JSON.parse(AlgoExplorerResponse)
         var accountBalance = obj["asset-holding"]["amount"];
         console.log(accountBalance);
     } else {
@@ -110,6 +111,19 @@ function goBack() {
     NewAlgoSection.removeChild(NewAlgoSection.childNodes[0]);
     NewAlgoSection.removeChild(NewAlgoSection.childNodes[0]);
     AlgoContent.style.display = "block";
+
+    console.log(ZoomButtons.style.display);
+
+    if (ZoomButtons.visibility === "hidden") {
+        ZoomButtons.setAttribute("hidden", "hidden");
+        console.log("TRUE");
+    } else {
+        console.log("FALSE");
+        ZoomButtons.setAttribute("hidden", "hidden");
+        cameraButtonSection.setAttribute("hidden", "hidden");
+        sliderContent.setAttribute("hidden", "hidden");
+        videoOn = false;
+    }
 
 }
 
@@ -248,11 +262,18 @@ async function loadModel() {
 model = loadModel();
 
 var children = [];
+let lastAwardedSpecies = [];
+let emptyArrayCounter = 0;
+let maxSeen = 0;
 
 video.style = 'margin-left: ' + ((screenWidth / screenRatio) + screenPadding) + 'px;'
 
 function predictWebcam() {
     // Now let's start classifying a frame in the stream.
+    if (videoOn === false) {
+        
+        return
+    }
 
     // Get current time
     const now = performance.now();
@@ -260,8 +281,6 @@ function predictWebcam() {
     let lastSeenForArray = null;
 
     current.toLocaleTimeString();
-
-    tf.engine().startScope();
 
     vidSliderOutput.innerHTML = vidSlider.value;
     confSliderOutput.innerHTML = confSlider.value;
@@ -288,6 +307,11 @@ function predictWebcam() {
         const classes = predictions[2].dataSync();
         //console.log('Classes: ', classes);
 
+        if (maxSeen < scores.length) {
+            maxSeen = scores.length;
+            console.log(maxSeen);
+        }
+
         // Remove any highlighting we did previous frame.
         for (let i = 0; i < children.length; i++) {
             liveView.removeChild(children[i]);
@@ -295,26 +319,26 @@ function predictWebcam() {
         
         children.splice(0);
 
-        vidSlider.oninput = function() {
-            vidSliderOutput.innerHTML = this.value;
-            screenRatio = this.value;
-            adjustedWidth = ((screenWidth / screenRatio) + screenPadding);
-            video.style = 'margin-left: ' + adjustedWidth + 'px;'
-            video.style.height = camWidth + 'px'
-            video.style.width = camHeight + 'px'
-            console.log(adjustedWidth);
-        }
-
         confSlider.oninput = function() {
             confSliderOutput.innerHTML = this.value;
             threshold = (this.value / 100);
             console.log(threshold);
         }
         
+        vidSlider.oninput = function() {
+                vidSliderOutput.innerHTML = this.value;
+                screenRatio = this.value;
+                adjustedWidth = ((screenWidth / screenRatio) + screenPadding);
+                video.style = 'margin-left: ' + adjustedWidth + 'px;'
+                video.style.height = camWidth + 'px'
+                video.style.width = camHeight + 'px'
+                console.log(adjustedWidth);
+        }
+
         // Construct the FPS Visual Widget
         fpsTag.innerText = 'FPS: ' + fps;
-                
-        fpsTag.style = 'margin-left: ' + ((screenWidth / screenRatio) + screenPadding + 20) + 'px;';
+        
+        fpsTag.style = 'margin-left: ' + ((screenWidth / screenRatio) + screenPadding + 20) + 'px;'
 
         liveView.prepend(fpsTag);
 
@@ -325,7 +349,7 @@ function predictWebcam() {
 
         lastSeenWidget.innerText = 'Last Seen: ' + lastSeen + ' - ' + lastTime;
                 
-        lastSeenWidget.style = 'margin-left: ' + ((screenWidth / screenRatio) + screenPadding + 90) + 'px;';
+        lastSeenWidget.style = 'margin-left: ' + ((screenWidth / screenRatio) + screenPadding + 90) + 'px;'
 
         liveView.prepend(lastSeenWidget);
 
@@ -339,17 +363,17 @@ function predictWebcam() {
                 
                 const currentClass = document.createElement('p');
 
-                math1 = (n*4)
-                x1 = bboxes[math1]
+                math1 = (n*4);
+                x1 = bboxes[math1];
 
-                math2 = (n*4)+1
-                y1 = bboxes[math2]
+                math2 = (n*4)+1;
+                y1 = bboxes[math2];
 
-                math3 = (n*4)+2
-                x2 = bboxes[math3]
+                math3 = (n*4)+2;
+                x2 = bboxes[math3];
                 
-                math4 = (n*4)+3
-                y2 = bboxes[math4]
+                math4 = (n*4)+3;
+                y2 = bboxes[math4];
 
                 x1 *= camWidth;
                 x2 *= camWidth;
@@ -363,6 +387,15 @@ function predictWebcam() {
                 lastSeenForArray = labels[classes[n]];
 
                 lastTime = current.toLocaleTimeString();
+
+                var numOfLastSeen = lastSeenArray.filter(x => x === lastSeen).length;
+
+                // console.log(numOfLastSeen);
+
+                if (numOfLastSeen > fps && !lastAwardedSpecies.includes(lastSeen) || lastAwardedSpecies.length < maxSeen.length) {
+                    lastAwardedSpecies.push(lastSeen);
+                    console.log("SEND CONFIRMED SPECIES AND EARN BIRDS: " + lastAwardedSpecies);
+                }
 
                 currentClass.innerText = labels[classes[n]] + ' - with ' 
                         + Math.round(parseFloat(scores[n]) * 100) 
@@ -386,8 +419,6 @@ function predictWebcam() {
                 children.push(currentClass);
             }
         }
-        
-        tf.engine().endScope();
 
         while (times.length > 0 && times[0] <= now - 1000) {
             times.shift();
@@ -401,8 +432,20 @@ function predictWebcam() {
             lastSeenArray.push(lastSeenForArray);
         }
 
-
         if (frameCounter > (fps*2)) {
+            
+            if (lastSeenArray.length === 0) {
+                emptyArrayCounter += 1;
+                console.log('No Species Seen: ' + emptyArrayCounter);
+            }
+            
+            if (emptyArrayCounter === 3) {
+                emptyArrayCounter = 0;
+                lastAwardedSpecies = [];
+                maxSeen = 0;
+                console.log('Species Awarded Reset');
+            }
+
             frameCounter = 0;
             console.log(lastSeenArray);
             lastSeenArray = [];
