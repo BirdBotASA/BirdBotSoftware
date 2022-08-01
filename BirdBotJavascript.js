@@ -17,6 +17,7 @@ const approxLong =  geoJSON.longitude;
 var threshold = 0.70;
 
 let labels = ["Abert's Towhee", "Allen's Hummingbird", "Ruby-throated Hummingbird", "Rufous Hummingbird", "American Crow", "Northern Mockingbird", "American Goldfinch", "Pine Siskin", "House Finch - Female", "Chestnut-backed Chickadee", "House Sparrow", "Golden-crowned Sparrow", "Black-capped Chickadee", "Steller's Jay", "American Robin", "Eastern Towhee", "American Tree Sparrow", "Anna's Hummingbird", "Ash-throated Flycatcher", "Bald Eagle", "Baltimore Oriole", "Barn Swallow", "Cedar Waxwing", "Bewick's Wren", "Verdin", "Black_Phoebe", "House Wren", "Mountain Chickadee", "Dark-eyed Junco", "Red-breasted Nuthatch", "House Finch - Male", "Townsend's Warbler", "European Starling", "Black-chinned Hummingbird", "Black-crested Titmouse", "Black-headed Grosbeak", "Black-headed Grosbeak - Female", "White-crowned Sparrow", "Red-winged Blackbird", "Brown-headed Cowbird", "Western Bluebird", "Common Grackle", "Bullock's Oriole", "Black-billed Magpie", "Black Bear", "Black Vulture", "Common Raven", "Osprey", "Carolina Wren", "California Scrub-Jay", "Turkey Vulture", "Northern Cardinal", "Eastern Phoebe", "Blue Jay", "Brewer's Blackbird", "Great-tailed Grackle", "California Towhee", "Grey Catbird", "Rock Pigeon", "Broad-tailed Hummingbird", "Bushtit", "Eurasian Collared-Dove", "Western Tanager", "White-breasted Nuthatch", "Pine Warbler", "Common Yellowthroat", "Cooper's Hawk", "Cactus Wren", "Say's Phoebe", "Song Sparrow", "Carolina Chickadee", "Ruby-crowned Kinglet", "Red-bellied Woodpecker", "Red-headed Woodpecker", "Chimney Swift", "Chipping Sparrow", "Clay-colored Sparrow", "Common Redpoll", "Curve-billed Thrasher", "Purple Finch", "Northern Flicker", "Downy Woodpecker", "Tufted Titmouse", "Eastern Bluebird", "Eastern Kingbird", "Eastern Meadowlark", "Mourning Dove", "Gambel's Quail", "Gila Woodpecker", "Golden-fronted Woodpecker", "Horned Lark", "House Fire", "Indigo Bunting", "Killdeer", "Ladder-backed Woodpecker", "Lesser Goldfinch", "Loggerhead Shrike", "Mountain Bluebird", "Oak Titmouse", "Orange-crowned Warbler", "Orchard Oriole", "Osprey - Chick", "Osprey - Egg", "Painted Bunting", "Phainopepla", "Red-shouldered Hawk", "Western Kingbird", "Yellow_rumped_Warbler", "Spotted Towhee", "Savannah Sparrow", "Western Meadowlark", "Wild Boar", "Yellow Warbler"];
+console.log(labels);
 let ASA_id = '478549868'
 let fps;
 let fpsTag = document.getElementById('FPSTag');
@@ -383,6 +384,8 @@ function predictWebcam() {
                 const boxHeight = y2 - y1;
 
                 lastSeen = labels[classes[n]];
+
+                console.log(lastSeen);
 
                 lastSeenForArray = labels[classes[n]];
 
